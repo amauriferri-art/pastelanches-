@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PASTELANCHES - Pedido Online</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ea1d2c;
+            --bg: #f2f2f2;
+            --dark: #333;
+            --grey: #717171;
+            --light-grey: #e6e6e6;
+        }
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg); padding-bottom: 100px; }
+
+        /* HEADER */
+        .header { background: white; padding-bottom: 15px; position: relative; }
+        .banner { height: 160px; background: url('https://img.freepik.com/fotos-gratis/hamburguer-saboroso-isolado-no-fundo-branco-fast-food-hamburguer-fresco-com-carne-e-queijo_90220-1063.jpg') center/cover; position: relative; }
+        .banner::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.3); }
+        
+        .loja-info { text-align: center; margin-top: -40px; position: relative; z-index: 2; padding-bottom: 10px; }
+        .logo { width: 90px; height: 90px; border-radius: 50%; border: 3px solid white; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .titulo { font-size: 1.4rem; font-weight: 800; color: var(--dark); margin: 5px 0; }
+        .status { background: #2ecc71; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-bottom: 5px; }
+        .status.fechado { background: #e74c3c; }
+
+        /* BARRA DE PESQUISA */
+        .search-container { padding: 0 15px; max-width: 600px; margin: 0 auto; }
+        .search-box {
+            background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; padding: 10px 15px;
+        }
+        .search-box i { color: var(--grey); margin-right: 10px; }
+        .search-box input { border: none; background: transparent; width: 100%; outline: none; font-size: 1rem; color: var(--dark); }
+
+        /* CATEGORIAS */
+        .categorias-bar {
+            display: flex; gap: 10px; overflow-x: auto; padding: 15px; background: white;
+            scrollbar-width: none; border-bottom: 1px solid #eee;
+            position: sticky; top: 0; z-index: 999; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .cat-item { white-space: nowrap; padding: 8px 15px; border-radius: 20px; background: #eee; color: var(--grey); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
+        .cat-item.active { background: var(--primary); color: white; }
+
+        /* LISTA DE PRODUTOS */
+        .container { max-width: 600px; margin: 0 auto; }
+        .secao-titulo { padding: 20px 15px 10px; font-size: 1.1rem; font-weight: 700; color: var(--dark); scroll-margin-top: 80px; }
+        
+        .produto-card {
+            background: white; margin: 0 15px 15px; padding: 15px; border-radius: 8px;
+            display: flex; gap: 15px; border: 1px solid transparent; cursor: pointer; transition: 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative;
+        }
+        .produto-card:hover { border-color: #ddd; }
+        .prod-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .prod-nome { font-weight: 600; color: var(--dark); margin-bottom: 5px; }
+        .prod-desc { font-size: 0.8rem; color: var(--grey); margin-bottom: 8px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .prod-preco { color: var(--primary); font-weight: 700; }
+        .prod-img { width: 85px; height: 85px; border-radius: 8px; background-size: cover; background-position: center; flex-shrink: 0; background-color: #eee; }
+        
+        .badge-tempo {
+            display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; color: #666; background: #f5f5f5; padding: 2px 8px; border-radius: 4px; margin-top: 5px; width: fit-content;
+        }
+
+        /* MODAIS */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000;
+            display: flex; align-items: flex-end; visibility: hidden; opacity: 0; transition: 0.3s;
+        }
+        .modal-overlay.open { visibility: visible; opacity: 1; }
+        
+        .modal-content {
+            background: white; width: 100%; max-width: 600px; margin: 0 auto;
+            border-radius: 20px 20px 0 0; padding: 20px; transform: translateY(100%); transition: 0.3s;
+            max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column;
+        }
+        .modal-overlay.open .modal-content { transform: translateY(0); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-fechar { border: none; background: none; font-size: 1.5rem; color: var(--grey); cursor: pointer; }
+        
+        .input-form { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin: 8px 0 15px; font-family: inherit; }
+        .label-form { font-weight: 600; font-size: 0.9rem; color: var(--dark); }
+
+        .controles-qtd { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; }
+        .btn-qtd { width: 35px; height: 35px; border-radius: 50%; border: 1px solid #ddd; background: white; font-weight: bold; color: var(--primary); font-size: 1.2rem; cursor: pointer; }
+        .qtd-numero { font-weight: bold; font-size: 1.1rem; }
+
+        .btn-acao {
+            background: var(--primary); color: white; border: none; padding: 15px;
+            border-radius: 8px; width: 100%; font-weight: bold; font-size: 1rem; margin-top: 20px;
+            display: flex; justify-content: space-between; cursor: pointer;
+        }
+
+        /* BARRA DE CARRINHO */
+        .cart-bar {
+            position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 900; display: none; cursor: pointer;
+        }
+        .cart-bar.visible { display: block; }
+        .cart-content { max-width: 600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 12px 20px; border-radius: 8px; }
+
+        /* LISTA CARRINHO */
+        .cart-item { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 10px 0; }
+        .cart-item-info { font-size: 0.9rem; }
+        .cart-item-remove { color: var(--primary); font-size: 0.8rem; cursor: pointer; text-decoration: underline; }
+
+        /* OPÇÕES DE ENTREGA */
+        .delivery-options { display: flex; gap: 10px; margin-bottom: 15px; }
+        .delivery-option {
+            flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: 600; color: var(--grey);
+        }
+        .delivery-option.selected { border-color: var(--primary); background: #fff0f1; color: var(--primary); }
+        .hidden { display: none; }
+
+        /* INFO PIX */
+        .pix-info-box { background: #e6fffa; padding: 10px; border-radius: 8px; border: 1px solid #b2f5ea; margin-bottom: 15px; }
+        .pix-text { color: #2c7a7b; font-size: 0.9rem; margin-bottom: 5px; }
+        .pix-alert { color: #e53e3e; font-size: 0.85rem; font-weight: bold; margin-top: 8px; }
+
+        /* Responsividade Desktop */
+        @media(min-width: 768px) {
+            .modal-content { border-radius: 12px; margin: auto; transform: translateY(20px) !important; }
+            .modal-overlay { align-items: center; }
+            .cart-bar { max-width: 600px; left: 50%; transform: translateX(-50%); border-radius: 12px 12px 0 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="banner"></div>
+    <div class="loja-info container">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" class="logo">
+        <h1 class="titulo">PASTELANCHES</h1>
+        <div id="status-loja" class="status">Aberto</div>
+        <p style="color: #666; font-size: 0.9rem;">🍔 Lanches • 🍟 Porções • 🥟 Pastéis • 🥤 Bebidas</p>
+    </div>
+    
+    <div class="search-container">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="Buscar lanches, pastéis..." onkeyup="filtrarCardapio()">
+        </div>
+    </div>
+</div> 
+
+<div class="categorias-bar container">
+    <a href="#cat-lanches" class="cat-item active">Lanches</a>
+    <a href="#cat-porcoes" class="cat-item">Porções</a>
+    <a href="#cat-pasteis" class="cat-item">Pastéis</a>
+    <a href="#cat-caldos" class="cat-item">Caldos</a>
+    <a href="#cat-bebidas" class="cat-item">Bebidas</a>
+    <a href="#cat-sucos" class="cat-item">Sucos</a>
+</div>
+
+<div class="container" id="cardapio-lista">
+    </div>
+
+<div class="modal-overlay" id="modal-produto">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-titulo">Nome do Produto</h3>
+            <button class="btn-fechar" onclick="fecharModal('modal-produto')">&times;</button>
+        </div>
+        <p id="modal-desc" style="color:#666; margin-bottom:15px">Descrição do produto...</p>
+        <p id="modal-preco" style="color:var(--primary); font-weight:bold; font-size:1.2rem">R$ 0,00</p>
+        
+        <label class="label-form">Observação:</label>
+        <textarea id="modal-obs" class="input-form" placeholder="Ex: Sem cebola, capricha no molho..."></textarea>
+
+        <div class="controles-qtd">
+            <span style="font-weight:600">Quantidade:</span>
+            <div style="display:flex; align-items:center; gap:15px">
+                <button class="btn-qtd" onclick="alterarQtd(-1)">-</button>
+                <span id="modal-qtd" class="qtd-numero">1</span>
+                <button class="btn-qtd" onclick="alterarQtd(1)">+</button>
+            </div>
+        </div>
+
+        <button class="btn-acao" onclick="adicionarAoCarrinho()">
+            <span>Adicionar</span>
+            <span id="modal-btn-total">R$ 0,00</span>
+        </button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-carrinho">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Sua Sacola</h3>
+            <button class="btn-fechar" onclick="fecharModal('modal-carrinho')">&times;</button>
+        </div>
+        <div id="lista-carrinho" style="margin-bottom: 20px;">
+            </div>
+        
+        <div style="margin-top:auto">
+            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:1.1rem; margin-bottom:15px">
+                <span>Total:</span>
+                <span id="total-carrinho">R$ 0,00</span>
+            </div>
+            
+            <button class="btn-acao" onclick="abrirCheckout()">
+                <span>Continuar para Dados</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-checkout">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Finalizar Pedido</h3>
+            <button class="btn-fechar" onclick="fecharModal('modal-checkout')">&times;</button>
+        </div>
+
+        <label class="label-form">Seus Dados:</label>
+        <input type="text" id="cliente-nome" class="input-form" placeholder="Seu Nome">
+        <input type="tel" id="cliente-tel" class="input-form" placeholder="Seu WhatsApp/Telefone">
+
+        <label class="label-form">Tipo de Entrega:</label>
+        <div class="delivery-options">
+            <div class="delivery-option selected" id="opt-retirada" onclick="mudarEntrega('retirada')">
+                <i class="fas fa-store"></i> Retirada
+            </div>
+            <div class="delivery-option" id="opt-entrega" onclick="mudarEntrega('entrega')">
+                <i class="fas fa-motorcycle"></i> Entrega
+            </div>
+        </div>
+
+        <div id="div-endereco" class="hidden">
+            <label class="label-form">Endereço de Entrega:</label>
+            <input type="text" id="cliente-endereco" class="input-form" placeholder="Rua, Número, Bairro e Referência">
+        </div>
+
+        <label class="label-form">Pagamento:</label>
+        <select id="pagamento" class="input-form" onchange="mudarPagamento()">
+            <option value="Cartão" selected>Cartão de Crédito/Débito</option>
+            <option value="Pix">Pix</option>
+            <option value="Dinheiro">Dinheiro</option>
+        </select>
+
+        <div id="div-pix" class="hidden pix-info-box">
+            <p class="pix-text"><strong>Chave Pix (Celular):</strong> 27999024130</p>
+            <p class="pix-text"><strong>Nome:</strong> Regiana Ferri</p>
+            <p class="pix-alert">⚠️ Favor enviar o comprovante no WhatsApp após o pedido.</p>
+        </div>
+
+        <div id="div-troco" class="hidden">
+            <label class="label-form">Troco para quanto?</label>
+            <input type="text" id="troco-valor" class="input-form" placeholder="Ex: R$ 50,00 ou R$ 100,00">
+        </div>
+
+        <button class="btn-acao" style="background:#25D366" onclick="finalizarPedidoZap()">
+            <i class="fab fa-whatsapp"></i> Enviar Pedido no Zap
+        </button>
+    </div>
+</div>
+
+<div class="cart-bar" id="cart-bar" onclick="abrirCarrinho()">
+    <div class="cart-content">
+        <span><i class="fas fa-shopping-bag"></i> Ver Sacola</span>
+        <span id="cart-bar-total">R$ 0,00</span>
+    </div>
+</div>
+
+<script>
+    // --- DADOS DO CARDÁPIO ---
+    const cardapio = [
+        // LANCHES
+        { cat: 'lanches', nome: 'Hambúrguer', desc: 'Bife de hambúrguer, alface, tomate, milho e batata palha.', preco: 15.00, img: 'https://img.freepik.com/fotos-gratis/hamburguer-saboroso-isolado-no-fundo-branco-fast-food-hamburguer-fresco-com-carne-e-queijo_90220-1063.jpg' },
+        { cat: 'lanches', nome: 'X-Burguer', desc: 'Bife de hambúrguer, queijo, alface, tomate, milho e batata palha.', preco: 15.50, img: '' },
+        { cat: 'lanches', nome: 'X-Bacon', desc: 'Bife de hambúrguer, bacon, queijo, alface, tomate, milho e batata palha.', preco: 16.00, img: 'https://img.freepik.com/fotos-gratis/hamburguer-fresco-isolado-no-branco_144627-10609.jpg' },
+        { cat: 'lanches', nome: 'X-Egg Burgues', desc: 'Bife de hambúrguer, ovo, queijo, alface, tomate, milho e batata palha.', preco: 16.00, img: '' },
+        { cat: 'lanches', nome: 'X-Egg Bacon', desc: 'Bife de hambúrguer, bacon, ovo, queijo, alface, tomate, milho e batata palha.', preco: 17.00, img: '' },
+        { cat: 'lanches', nome: 'X-Tudo', desc: 'Bife de hambúrguer, bacon, ovo, queijo, presunto, alface, tomate, milho e batata palha.', preco: 18.00, img: 'https://img.freepik.com/fotos-gratis/vista-frontal-hamburguer-de-carne-e-queijo_23-2148784489.jpg' },
+        { cat: 'lanches', nome: 'X-Americano', desc: '2 bifes de hambúrguer, ovo, queijo, presunto, alface, tomate, bacon, milho e batata palha.', preco: 20.00, img: 'https://img.freepik.com/fotos-gratis/hamburguer-grande-com-duplo-bife-e-queijo_140725-6908.jpg' },
+
+        // PORÇÕES
+        { cat: 'porcoes', nome: 'Prato da Casa', desc: 'Frango passarinho e filé de boi c/ polenta, aipim, batata frita, anel de cebola.', preco: 110.00, img: '' },
+        { cat: 'porcoes', nome: 'Carne Seca', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 90.00, img: '' },
+        { cat: 'porcoes', nome: 'File de Boi (Completo)', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 80.00, img: '' },
+        { cat: 'porcoes', nome: 'Filé de Boi', desc: 'Acompanha complementos (sem fritas).', preco: 60.00, img: '' },
+        { cat: 'porcoes', nome: 'Frango a Passarinho (Completo)', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 80.00, img: '' },
+        { cat: 'porcoes', nome: 'Frango a Passarinho (Simples)', desc: 'Sem fritas.', preco: 60.00, img: '' },
+        { cat: 'porcoes', nome: 'Camarão (Completo)', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 90.00, img: '' },
+        { cat: 'porcoes', nome: 'Camarão (Simples)', desc: 'Sem fritas.', preco: 70.00, img: '' },
+        { cat: 'porcoes', nome: 'Pescada (Completa', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 80.00, img: '' },
+        { cat: 'porcoes', nome: 'Telha Camarão e Filé de Boi', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 120.00, img: '' },
+        { cat: 'porcoes', nome: 'Telha Camarão e Frango', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 120.00, img: '' },
+        { cat: 'porcoes', nome: 'Telha Camarão e Carne Seca', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 130.00, img: '' },
+        { cat: 'porcoes', nome: 'Telha Camarão e Pescada', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 130.00, img: '' },
+        { cat: 'porcoes', nome: 'Batata Frita', desc: 'Porção tradicional.', preco: 40.00, img: 'https://img.freepik.com/fotos-gratis/batatas-fritas-crocantes_144627-18036.jpg' },
+        { cat: 'porcoes', nome: 'Batata, Queijo e Bacon', desc: 'Batata frita especial.', preco: 50.00, img: 'https://img.freepik.com/fotos-gratis/deliciosas-batatas-fritas-com-queijo-e-bacon_23-2148560187.jpg' },
+        { cat: 'porcoes', nome: 'Porção de Pastelzinho', desc: '16 unidades.', preco: 40.00, img: 'https://img.freepik.com/fotos-gratis/pastel-brasileiro-com-carne-carne-moida_123827-23652.jpg' },
+        { cat: 'porcoes', nome: 'Tábua de Frios', desc: 'Salaminho, ovo de codorna, azeitona, presunto e queijo.', preco: 50.00, img: '' },
+
+        // PASTÉIS
+        { cat: 'pasteis', nome: 'Frango c/ Queijo', desc: 'Pastel frito na hora.', preco: 8.00, img: '' },
+        { cat: 'pasteis', nome: 'Frango Puro', desc: 'Pastel frito na hora.', preco: 8.00, img: '' },
+        { cat: 'pasteis', nome: 'Queijo e Presunto', desc: 'Pastel frito na hora.', preco: 8.00, img: '' },
+        { cat: 'pasteis', nome: 'Queijo Puro', desc: 'Pastel frito na hora.', preco: 8.00, img: '' },
+        { cat: 'pasteis', nome: 'Carne Pura', desc: 'Pastel frito na hora.', preco: 8.00, img: '' },
+        { cat: 'pasteis', nome: 'Goiaba c/ Queijo', desc: 'Pastel doce.', preco: 8.00, img: '' },
+        { cat: 'pasteis', nome: 'Banana c/ Queijo', desc: 'Pastel doce.', preco: 8.00, img: '' },
+        { cat: 'pasteis', nome: 'Carne c/ Queijo', desc: 'Pastel frito na hora.', preco: 8.00, img: '' },
+
+        // CALDOS
+        { cat: 'caldos', nome: 'Dobradinha', desc: 'Caldo quente.', preco: 25.00, img: '' },
+        { cat: 'caldos', nome: 'Caldo Verde', desc: 'Caldo quente.', preco: 25.00, img: '' },
+
+        // BEBIDAS
+        { cat: 'bebidas', nome: 'Coca-Cola 1.5L', desc: 'Garrafa.', preco: 11.00, img: '' },
+        { cat: 'bebidas', nome: 'Coca-Cola 2L', desc: 'Garrafa.', preco: 13.00, img: '' },
+        { cat: 'bebidas', nome: 'Coca-Cola 600ml', desc: 'Garrafa.', preco: 8.00, img: '' },
+        { cat: 'bebidas', nome: 'Coca-Cola Lata', desc: '350ml gelada.', preco: 6.00, img: 'https://img.cdndsgni.com/preview/10000392.jpg' },
+        { cat: 'bebidas', nome: 'Uai Sabores', desc: 'Refrigerante.', preco: 7.00, img: '' },
+        { cat: 'bebidas', nome: 'Uai 600ml', desc: 'Refrigerante.', preco: 6.00, img: '' },
+        { cat: 'bebidas', nome: 'Red Bull', desc: 'Energético.', preco: 15.00, img: '' },
+        { cat: 'bebidas', nome: 'Taça de Vinho', desc: 'Vinho da casa.', preco: 10.00, img: '' },
+        { cat: 'bebidas', nome: 'Caipirinha', desc: 'Drink.', preco: 15.00, img: '' },
+        { cat: 'bebidas', nome: 'Caipivodka', desc: 'Drink.', preco: 15.00, img: '' },
+        { cat: 'bebidas', nome: 'Água Mineral', desc: 'Sem gás.', preco: 3.00, img: '' },
+
+        // SUCOS
+        { cat: 'sucos', nome: 'Suco para Viagem (500ml)', desc: 'Sabores: Abacaxi, Acerola, Cacau, Cupuaçu, Goiaba, Laranja, Graviola, Manga, Maracujá, Morango, Uva.', preco: 11.00, img: '' }
+    ];
+
+    // ESTADO DO APLICATIVO
+    let carrinho = [];
+    let produtoAtual = null;
+    let quantidadeAtual = 1;
+    let tipoEntrega = 'retirada'; // 'retirada' ou 'entrega'
+
+    // FUNÇÃO PARA CALCULAR TEMPO
+    function getTempoEstimado(categoria) {
+        if(categoria === 'lanches' || categoria === 'pasteis') return '30 min';
+        if(categoria === 'porcoes') return '40 a 90 min';
+        if(categoria === 'caldos') return '30 min';
+        return ''; // Bebidas/Sucos não tem tempo
+    }
+
+    // RENDERIZAR CARDÁPIO
+    function renderizarCardapio(filtro = '') {
+        const container = document.getElementById('cardapio-lista');
+        container.innerHTML = ''; // Limpa antes de renderizar
+
+        const categorias = {
+            'lanches': '🍔 Lanches',
+            'porcoes': '🍟 Porções',
+            'pasteis': '🥟 Pastéis',
+            'caldos': '🍲 Caldos',
+            'bebidas': '🥤 Bebidas',
+            'sucos': '🍹 Sucos'
+        };
+
+        for (let [key, titulo] of Object.entries(categorias)) {
+            // Filtra os itens baseado na pesquisa e categoria
+            const itens = cardapio.filter(i => 
+                i.cat === key && 
+                i.nome.toLowerCase().includes(filtro.toLowerCase())
+            );
+
+            if(itens.length === 0) continue;
+
+            let html = `<div id="cat-${key}"><h2 class="secao-titulo">${titulo}</h2>`;
+            itens.forEach((item) => {
+                const realIndex = cardapio.indexOf(item); // Pega o index original para abrir o modal certo
+                const imgStyle = item.img ? `background-image: url('${item.img}')` : 'background-color: #eee';
+                const tempo = getTempoEstimado(item.cat);
+                const badgeTempo = tempo ? `<div class="badge-tempo"><i class="far fa-clock"></i> ${tempo}</div>` : '';
+
+                html += `
+                <div class="produto-card" onclick="abrirModalProduto(${realIndex})">
+                    <div class="prod-info">
+                        <div class="prod-nome">${item.nome}</div>
+                        <div class="prod-desc">${item.desc}</div>
+                        <div class="prod-preco">R$ ${item.preco.toFixed(2).replace('.', ',')}</div>
+                        ${badgeTempo}
+                    </div>
+                    <div class="prod-img" style="${imgStyle}"></div>
+                </div>`;
+            });
+            html += `</div>`;
+            container.innerHTML += html;
+        }
+    }
+
+    // PESQUISA
+    function filtrarCardapio() {
+        const termo = document.getElementById('search-input').value;
+        renderizarCardapio(termo);
+    }
+
+    // MODAL DE PRODUTO
+    function abrirModalProduto(index) {
+        produtoAtual = cardapio[index];
+        quantidadeAtual = 1;
+
+        document.getElementById('modal-qtd').innerText = "1"; 
+        document.getElementById('modal-titulo').innerText = produtoAtual.nome;
+        document.getElementById('modal-desc').innerText = produtoAtual.desc;
+        document.getElementById('modal-preco').innerText = `R$ ${produtoAtual.preco.toFixed(2).replace('.', ',')}`;
+        document.getElementById('modal-obs').value = '';
+        
+        if(produtoAtual.cat === 'sucos') {
+            document.getElementById('modal-obs').placeholder = "Digite o sabor aqui (Ex: Morango)...";
+        } else {
+            document.getElementById('modal-obs').placeholder = "Ex: Sem cebola, capricha no molho...";
+        }
+
+        atualizarTotalModal();
+        document.getElementById('modal-produto').classList.add('open');
+    }
+
+    function alterarQtd(val) {
+        if (quantidadeAtual + val >= 1) {
+            quantidadeAtual += val;
+            document.getElementById('modal-qtd').innerText = quantidadeAtual;
+            atualizarTotalModal();
+        }
+    }
+
+    function atualizarTotalModal() {
+        const total = produtoAtual.preco * quantidadeAtual;
+        document.getElementById('modal-btn-total').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+    }
+
+    function adicionarAoCarrinho() {
+        const obs = document.getElementById('modal-obs').value;
+        const item = {
+            ...produtoAtual,
+            qtd: quantidadeAtual,
+            obs: obs,
+            total: produtoAtual.preco * quantidadeAtual
+        };
+        carrinho.push(item);
+        fecharModal('modal-produto');
+        atualizarCarrinhoUI();
+    }
+
+    // CARRINHO UI
+    function atualizarCarrinhoUI() {
+        const cartBar = document.getElementById('cart-bar');
+        const lista = document.getElementById('lista-carrinho');
+        const totalEl = document.getElementById('total-carrinho');
+        const barTotalEl = document.getElementById('cart-bar-total');
+
+        const totalGeral = carrinho.reduce((acc, item) => acc + item.total, 0);
+
+        if (carrinho.length > 0) {
+            cartBar.classList.add('visible');
+            barTotalEl.innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+        } else {
+            cartBar.classList.remove('visible');
+            fecharModal('modal-carrinho');
+            fecharModal('modal-checkout');
+        }
+
+        lista.innerHTML = '';
+        carrinho.forEach((item, index) => {
+            lista.innerHTML += `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <strong>${item.qtd}x ${item.nome}</strong> <br>
+                    <span style="color:#666; font-size:0.8rem">${item.obs ? 'Obs: ' + item.obs : ''}</span>
+                </div>
+                <div style="text-align:right">
+                    <div style="font-weight:bold">R$ ${item.total.toFixed(2).replace('.', ',')}</div>
+                    <div class="cart-item-remove" onclick="removerDoCarrinho(${index})">Remover</div>
+                </div>
+            </div>`;
+        });
+        totalEl.innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+    }
+
+    function removerDoCarrinho(index) {
+        carrinho.splice(index, 1);
+        atualizarCarrinhoUI();
+    }
+
+    function abrirCarrinho() {
+        document.getElementById('modal-carrinho').classList.add('open');
+    }
+
+    // CHECKOUT FUNCTIONS
+    function abrirCheckout() {
+        fecharModal('modal-carrinho');
+        document.getElementById('modal-checkout').classList.add('open');
+    }
+
+    function mudarEntrega(tipo) {
+        tipoEntrega = tipo;
+        document.getElementById('opt-retirada').classList.remove('selected');
+        document.getElementById('opt-entrega').classList.remove('selected');
+        
+        if (tipo === 'retirada') {
+            document.getElementById('opt-retirada').classList.add('selected');
+            document.getElementById('div-endereco').classList.add('hidden');
+        } else {
+            document.getElementById('opt-entrega').classList.add('selected');
+            document.getElementById('div-endereco').classList.remove('hidden');
+        }
+    }
+
+    function mudarPagamento() {
+        const tipo = document.getElementById('pagamento').value;
+        const divPix = document.getElementById('div-pix');
+        const divTroco = document.getElementById('div-troco');
+
+        // Reseta visibilidade
+        divPix.classList.add('hidden');
+        divTroco.classList.add('hidden');
+
+        if (tipo === 'Pix') {
+            divPix.classList.remove('hidden');
+        } else if (tipo === 'Dinheiro') {
+            divTroco.classList.remove('hidden');
+        }
+    }
+
+    function fecharModal(id) {
+        document.getElementById(id).classList.remove('open');
+    }
+
+    function finalizarPedidoZap() {
+        if (carrinho.length === 0) return;
+
+        // Coleta dados
+        const nome = document.getElementById('cliente-nome').value;
+        const telefoneUser = document.getElementById('cliente-tel').value;
+        const pagamento = document.getElementById('pagamento').value;
+        const endereco = document.getElementById('cliente-endereco').value;
+        const troco = document.getElementById('troco-valor').value;
+
+        // Validação Simples
+        if(!nome || !telefoneUser) {
+            alert("Por favor, preencha seu Nome e Telefone.");
+            return;
+        }
+        if(tipoEntrega === 'entrega' && !endereco) {
+            alert("Por favor, preencha o endereço de entrega.");
+            return;
+        }
+
+        let mensagem = `*NOVO PEDIDO - PASTELANCHES* 🍔\n`;
+        mensagem += `--------------------------\n`;
+        mensagem += `*Cliente:* ${nome}\n`;
+        mensagem += `*Tel:* ${telefoneUser}\n`;
+        mensagem += `*Tipo:* ${tipoEntrega === 'entrega' ? '🛵 ENTREGA' : '🛍️ RETIRADA'}\n`;
+        
+        if(tipoEntrega === 'entrega') {
+            mensagem += `*Endereço:* ${endereco}\n`;
+        }
+        mensagem += `--------------------------\n\n`;
+
+        carrinho.forEach(item => {
+            mensagem += `*${item.qtd}x ${item.nome}*\n`;
+            if (item.obs) mensagem += `_Obs: ${item.obs}_\n`;
+            mensagem += `R$ ${item.total.toFixed(2).replace('.', ',')}\n\n`;
+        });
+
+        const totalGeral = carrinho.reduce((acc, item) => acc + item.total, 0);
+        mensagem += `--------------------------\n`;
+        mensagem += `*TOTAL: R$ ${totalGeral.toFixed(2).replace('.', ',')}*\n`;
+        mensagem += `*Pagamento:* ${pagamento}\n`;
+        
+        if(pagamento === "Dinheiro" && troco) {
+            mensagem += `*Troco para:* ${troco}\n`;
+        } else if (pagamento === "Dinheiro" && !troco) {
+            mensagem += `_(Não precisa de troco)_\n`;
+        } else if (pagamento === "Pix") {
+            mensagem += `_(PIX : 27999024130 'Regiana Ferri' Enviar Comprovante do pagamento)_\n`;
+        }
+
+        const telefoneLoja = "5527999024130"; 
+        window.open(`https://wa.me/${telefoneLoja}?text=${encodeURIComponent(mensagem)}`, '_blank');
+    }
+
+    // VERIFICAR HORÁRIO
+    function verificarHorario() {
+        const hora = new Date().getHours();
+        const statusEl = document.getElementById('status-loja');
+        if (hora >= 18 && hora < 23) {
+            statusEl.innerText = "Aberto Agora";
+            statusEl.classList.remove('fechado');
+        } else {
+            statusEl.innerText = "Fechado (Abre 18h)";
+            statusEl.classList.add('fechado');
+        }
+    }
+
+    // INICIALIZAÇÃO
+    window.onload = function() {
+        renderizarCardapio();
+        verificarHorario();
+    }
+</script>
+
+</body>
+</html>
