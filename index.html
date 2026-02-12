@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta property="og:title" content="PASTELANCHES - Night Market">
+    <meta property="og:description" content="O melhor lanche da noite! Peça agora pelo nosso cardápio digital.">
+    <meta property="og:image" content="https://i.ibb.co/LdM0LzGs/ssss.jpg">
+    <title>PASTELANCHES - Night Market</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    
+    <style>
+        :root {
+            /* --- TEMA ESCURO (PADRÃO) --- */
+            --primary: #00e676;     
+            --primary-dark: #00a854;
+            --secondary: #ffea00;   
+            --accent: #ff1744;      
+            
+            --bg: #121212;          
+            --surface: #1e1e1e;     
+            --surface-light: #2c2c2c;
+            --border-color: #333;
+            
+            --text-main: #ffffff;
+            --text-sec: #b0b0b0;
+            
+            --glow-primary: 0 0 10px rgba(0, 230, 118, 0.4);
+            --glow-secondary: 0 0 10px rgba(255, 234, 0, 0.4);
+            
+            --radius: 16px;
+        }
+
+        /* --- TEMA CLARO (OVERRIDE) --- */
+        body.light-mode {
+            --bg: #f4f4f4;
+            --surface: #ffffff;
+            --surface-light: #e0e0e0;
+            --border-color: #ddd;
+
+            --text-main: #1a1a1a;
+            --text-sec: #555555;
+            
+            /* Ajuste de cores neon para fundo branco */
+            --primary: #00c853; 
+            --secondary: #fbc02d; /* Amarelo mais escuro para leitura */
+            
+            --glow-primary: 0 4px 15px rgba(0, 200, 83, 0.2);
+            --glow-secondary: none;
+        }
+
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background-color: var(--bg); 
+            padding-bottom: 120px; 
+            color: var(--text-main);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* HEADER */
+        .header { 
+            background: var(--surface); 
+            padding-bottom: 25px; 
+            border-radius: 0 0 30px 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+            position: relative; 
+            overflow: hidden; 
+            border-bottom: 2px solid var(--primary);
+            transition: background 0.3s;
+        }
+        
+        .banner { 
+            height: 180px; 
+            /* NOVA IMAGEM DE BANNER AQUI */
+            background-image: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8)), url('https://i.ibb.co/KpjtGH0f/Gemini-Generated-Image-rsdgctrsdgctrsdg.png');
+            background-size: cover;
+            background-position: center;
+            position: relative; 
+        }
+
+        /* BOTÃO TEMA */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            backdrop-filter: blur(5px);
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+        .theme-toggle:hover { background: var(--primary); color: #000; }
+        
+        .loja-info { text-align: center; margin-top: -70px; position: relative; z-index: 2; padding: 0 20px; }
+        
+        .logo { 
+            width: 120px; height: 120px; 
+            border-radius: 50%; 
+            border: 4px solid var(--surface); 
+            background: #000; 
+            object-fit: cover;
+            box-shadow: var(--glow-primary); 
+        }
+        
+        .titulo { 
+            font-size: 1.8rem; 
+            font-weight: 800; 
+            color: var(--secondary); 
+            margin: 10px 0 5px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+        }
+        
+        .status { 
+            background: transparent; 
+            color: var(--primary); 
+            border: 1px solid var(--primary);
+            padding: 5px 20px; 
+            border-radius: 50px; 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            display: inline-block; 
+            margin-bottom: 12px; 
+            box-shadow: var(--glow-primary);
+            text-transform: uppercase;
+        }
+        .status.fechado { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px rgba(255, 23, 68, 0.4); }
+
+        /* PESQUISA */
+        .search-container { padding: 15px 20px 0; max-width: 600px; margin: 0 auto; }
+        .search-box {
+            background: var(--surface-light); 
+            border-radius: 50px; 
+            display: flex; align-items: center; padding: 14px 25px;
+            border: 1px solid var(--border-color); transition: 0.3s;
+        }
+        .search-box:focus-within { 
+            border-color: var(--secondary); 
+            box-shadow: var(--glow-secondary); 
+        }
+        .search-box i { color: var(--secondary); margin-right: 12px; font-size: 1.1rem; }
+        .search-box input { 
+            border: none; background: transparent; width: 100%; 
+            font-size: 1rem; color: var(--text-main); 
+        }
+
+        /* CATEGORIAS */
+        .categorias-bar {
+            display: flex; gap: 12px; overflow-x: auto; padding: 20px 20px; background: var(--bg);
+            scrollbar-width: none; border-bottom: none;
+            position: sticky; top: 0; z-index: 99; 
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.3s;
+        }
+        .categorias-bar::-webkit-scrollbar { display: none; }
+        
+        .cat-item { 
+            white-space: nowrap; padding: 10px 22px; border-radius: 50px; 
+            background: var(--surface); color: var(--text-sec); 
+            text-decoration: none; font-weight: 600; font-size: 0.9rem; 
+            transition: 0.3s; border: 1px solid var(--border-color);
+        }
+        .cat-item.active { 
+            background: var(--primary); 
+            color: #000; 
+            border-color: var(--primary);
+            box-shadow: var(--glow-primary); 
+            transform: scale(1.05);
+            font-weight: 800;
+        }
+
+        /* PRODUTOS */
+        .container { max-width: 600px; margin: 0 auto; }
+        .secao-titulo { 
+            padding: 30px 20px 15px; font-size: 1.4rem; 
+            font-weight: 800; color: var(--text-main); 
+            display: flex; align-items: center; gap: 12px;
+        }
+        .secao-titulo::before { 
+            content:''; display: block; width: 6px; height: 25px; 
+            background: var(--secondary); border-radius: 4px; 
+            box-shadow: 0 0 8px var(--secondary);
+        }
+        
+        .produto-card {
+            background: var(--surface); 
+            margin: 0 20px 20px; padding: 15px; border-radius: var(--radius);
+            display: flex; gap: 15px; 
+            border: 1px solid var(--border-color); 
+            cursor: pointer; transition: 0.2s;
+            position: relative; overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .produto-card:active { transform: scale(0.98); border-color: var(--primary); }
+        
+        .prod-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .prod-nome { font-weight: 700; font-size: 1.05rem; color: var(--text-main); margin-bottom: 6px; line-height: 1.2; }
+        .prod-desc { font-size: 0.85rem; color: var(--text-sec); margin-bottom: 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .prod-preco { color: var(--secondary); font-weight: 800; font-size: 1.2rem; }
+        
+        .prod-img { 
+            width: 100px; height: 100px; border-radius: var(--radius); 
+            background-size: cover; background-position: center; flex-shrink: 0; 
+            background-color: var(--surface-light); border: 1px solid var(--border-color);
+        }
+        
+        .badge-tempo {
+            display: inline-flex; align-items: center; gap: 5px; font-size: 0.7rem; 
+            color: var(--text-main); background: rgba(128, 128, 128, 0.2); padding: 4px 10px; 
+            border-radius: 4px; margin-top: auto; width: fit-content; font-weight: 600;
+            border: 1px solid var(--border-color);
+        }
+
+        /* MODAIS */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000;
+            display: flex; align-items: flex-end; visibility: hidden; opacity: 0; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            backdrop-filter: blur(5px);
+        }
+        .modal-overlay.open { visibility: visible; opacity: 1; }
+        
+        .modal-content {
+            background: var(--surface); width: 100%; max-width: 600px; margin: 0 auto;
+            border-radius: 30px 30px 0 0; padding: 30px 25px; 
+            transform: translateY(100%); transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column;
+            border-top: 2px solid var(--primary);
+            box-shadow: 0 -10px 50px rgba(0,0,0,0.3);
+        }
+        .modal-overlay.open .modal-content { transform: translateY(0); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .modal-header h3 { font-size: 1.4rem; font-weight: 700; color: var(--text-main); padding-right: 20px; }
+        .btn-fechar { 
+            border: none; background: var(--surface-light); width: 36px; height: 36px; border-radius: 50%; 
+            font-size: 1.2rem; color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .btn-fechar:hover { background: var(--accent); color: white; }
+        
+        .input-form, textarea.input-form { 
+            width: 100%; padding: 16px; border: 1px solid var(--border-color); border-radius: 12px; 
+            margin: 8px 0 20px; font-family: inherit; font-size: 1rem; 
+            background: var(--surface-light); color: var(--text-main);
+        }
+        .input-form:focus { border-color: var(--primary); background: var(--bg); box-shadow: 0 0 8px rgba(0, 230, 118, 0.2); }
+        .label-form { font-weight: 600; font-size: 0.95rem; color: var(--secondary); display: block; margin-top: 10px;}
+
+        /* ADICIONAIS */
+        .adicionais-container {
+            margin-bottom: 15px;
+            background: var(--surface-light);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        .adicional-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .adicional-item:last-child { border-bottom: none; }
+        
+        .adicional-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            cursor: pointer;
+            width: 100%;
+        }
+        .adicional-checkbox { accent-color: var(--primary); width: 18px; height: 18px; cursor: pointer; }
+
+        /* QTD */
+        .controles-qtd { 
+            display: flex; align-items: center; justify-content: space-between; 
+            background: var(--surface-light); padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid var(--border-color);
+        }
+        .btn-qtd { 
+            width: 45px; height: 45px; border-radius: 12px; border: none; 
+            background: var(--primary); font-weight: 900; color: #000; 
+            font-size: 1.4rem; cursor: pointer; box-shadow: var(--glow-primary);
+        }
+        .qtd-numero { font-weight: 700; font-size: 1.4rem; min-width: 30px; text-align: center; color: var(--text-main); }
+
+        /* BOTÃO AÇÃO */
+        .btn-acao {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+            color: #000; border: none; padding: 20px;
+            border-radius: 15px; width: 100%; font-weight: 800; font-size: 1.2rem; margin-top: 25px;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 230, 118, 0.3); transition: 0.2s;
+            text-transform: uppercase;
+        }
+        .btn-acao:active { transform: scale(0.98); }
+        .btn-gps {
+            background: #2196F3;
+            color: white;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 20px rgba(33, 150, 243, 0.3);
+        }
+
+        /* CARRINHO FLUTUANTE */
+        .cart-bar {
+            position: fixed; bottom: 20px; left: 20px; right: 20px; margin: 0 auto; max-width: 560px;
+            z-index: 900; display: none; cursor: pointer; animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from { transform: translateY(100px); } to { transform: translateY(0); } }
+        
+        .cart-bar.visible { display: block; }
+        .cart-content { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: #111; color: var(--primary); padding: 18px 30px; border-radius: 50px; 
+            box-shadow: 0 0 20px rgba(0, 230, 118, 0.4); border: 2px solid var(--primary);
+        }
+        /* No modo claro, o carrinho flutuante mantém o estilo escuro para destaque */
+
+        /* LISTA CARRINHO */
+        .cart-item { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding: 15px 0; }
+        .cart-item-info strong { color: var(--text-main); font-size: 1.05rem; }
+        .cart-item-remove { color: var(--accent); font-size: 0.85rem; cursor: pointer; font-weight: 600; margin-top: 5px; display: inline-block; text-transform: uppercase; letter-spacing: 0.5px;}
+
+        /* OPÇÕES ENTREGA */
+        .delivery-options { display: flex; gap: 15px; margin-bottom: 15px; }
+        .delivery-option {
+            flex: 1; border: 2px solid var(--border-color); padding: 15px; border-radius: 12px; 
+            text-align: center; cursor: pointer; font-weight: 600; color: var(--text-sec);
+            transition: 0.2s; background: var(--surface-light);
+            display: flex; align-items: center; justify-content: center; gap: 8px; flex-direction: column;
+        }
+        .delivery-option i { display: block; font-size: 1.5rem; margin-bottom: 8px; }
+        .delivery-option.selected { border-color: var(--primary); background: rgba(0, 230, 118, 0.1); color: var(--primary); box-shadow: inset 0 0 15px rgba(0, 230, 118, 0.1); }
+        
+        /* Sub-opções de Endereço */
+        .sub-options { display: flex; gap: 10px; margin-bottom: 15px; margin-top: -10px; }
+        .sub-option {
+            flex: 1; padding: 10px; border-radius: 8px; font-size: 0.9rem; text-align: center;
+            border: 1px solid var(--border-color); background: var(--bg); cursor: pointer; color: var(--text-sec);
+        }
+        .sub-option.active { background: var(--surface-light); border-color: var(--secondary); color: var(--secondary); font-weight: bold; }
+
+        .hidden { display: none; }
+        
+        /* Select personalizado para dark/light */
+        select.input-form {
+             appearance: none;
+             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+             background-repeat: no-repeat;
+             background-position: right 1rem center;
+             background-size: 1em;
+        }
+        
+        /* INFO PIX */
+        .pix-info-box { background: rgba(0, 230, 118, 0.1); padding: 15px; border-radius: 12px; border: 1px dashed var(--primary); margin-bottom: 20px; }
+        .pix-text { color: var(--primary); font-size: 0.95rem; margin-bottom: 5px; }
+        .pix-alert { color: var(--secondary); font-size: 0.85rem; font-weight: bold; margin-top: 10px; display: flex; align-items: center; gap: 5px; }
+        
+        /* RESUMO DE VALORES NO CHECKOUT */
+        .resumo-checkout {
+            background: var(--surface-light);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+        .resumo-linha {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--text-sec);
+        }
+        .resumo-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-color);
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        /* Toastify */
+        .toastify { border-radius: 10px; font-family: 'Poppins', sans-serif; font-weight: 600; }
+
+        @media(min-width: 768px) {
+            body { background-color: #000; }
+            body.light-mode { background-color: #e0e0e0; }
+            .header { border-radius: 0 0 0 0; border-bottom: none; }
+            .modal-content { border: 2px solid var(--border-color); margin: auto; transform: translateY(20px) !important; max-height: 90vh; border-radius: 20px;}
+            .modal-overlay { align-items: center; padding: 20px; }
+            .cart-bar { bottom: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <button class="theme-toggle" id="theme-btn" onclick="alternarTema()">
+        <i class="fas fa-moon"></i>
+    </button>
+    <div class="banner"></div>
+    <div class="loja-info container">
+        <img src="https://i.ibb.co/LdM0LzGs/ssss.jpg" class="logo">
+        <h1 class="titulo">PASTELANCHES</h1>
+        <div id="status-loja" class="status">Aberto</div>
+        <p style="color: var(--text-sec); font-size: 0.9rem; font-weight: 500;">🍔 Lanches • 🍟 Porções • 🥣 Caldos • 🥟 Pastéis • 🥤 Bebidas</p>
+    </div>
+    
+    <div class="search-container">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="O que você vai comer hoje?" onkeyup="filtrarCardapio()">
+        </div>
+    </div>
+</div> 
+
+<div class="categorias-bar container">
+    <a href="#cat-prato_dia" class="cat-item active">Bolos do Dia</a>
+    <a href="#cat-lanches" class="cat-item">Lanches</a>
+    <a href="#cat-porcoes" class="cat-item">Porções</a>
+    <a href="#cat-pasteis" class="cat-item">Pastéis</a>
+    <a href="#cat-caldos" class="cat-item">Caldos</a>
+    <a href="#cat-bebidas" class="cat-item">Bebidas</a>
+    <a href="#cat-sucos" class="cat-item">Sucos</a>
+</div>
+
+<div class="container" id="cardapio-lista"></div>
+
+<div class="modal-overlay" id="modal-produto">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-titulo">Nome do Produto</h3>
+            <button class="btn-fechar" onclick="fecharModal('modal-produto')">&times;</button>
+        </div>
+        <p id="modal-desc" style="color:var(--text-sec); margin-bottom:15px; line-height: 1.5;">Descrição...</p>
+        <p id="modal-preco" style="color:var(--secondary); font-weight:800; font-size:1.8rem; text-shadow: 0 0 10px rgba(255, 234, 0, 0.3)">R$ 0,00</p>
+        
+        <div id="wrapper-adicionais" style="display:none;">
+            <label class="label-form">Turbine seu pedido:</label>
+            <div id="lista-adicionais" class="adicionais-container"></div>
+        </div>
+
+        <label class="label-form">Alguma observação?</label>
+        <textarea id="modal-obs" class="input-form" rows="3" placeholder="Ex: Tirar cebola, maionese à parte..."></textarea>
+
+        <div class="controles-qtd">
+            <span style="font-weight:600; color: var(--text-main)">Quantidade</span>
+            <div style="display:flex; align-items:center; gap:15px">
+                <button class="btn-qtd" onclick="alterarQtd(-1)">-</button>
+                <span id="modal-qtd" class="qtd-numero">1</span>
+                <button class="btn-qtd" onclick="alterarQtd(1)">+</button>
+            </div>
+        </div>
+
+        <button class="btn-acao" onclick="adicionarAoCarrinho()">
+            <span>Adicionar ao Pedido</span>
+            <span id="modal-btn-total">R$ 0,00</span>
+        </button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-carrinho">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Sua Sacola</h3>
+            <button class="btn-fechar" onclick="fecharModal('modal-carrinho')">&times;</button>
+        </div>
+        <div id="lista-carrinho" style="margin-bottom: 20px;"></div>
+        
+        <div style="margin-top:auto">
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.2rem; margin-bottom:15px; color: var(--text-main)">
+                <span>Subtotal</span>
+                <span id="total-carrinho" style="color: var(--secondary)">R$ 0,00</span>
+            </div>
+            
+            <button class="btn-acao" onclick="abrirCheckout()">
+                <span>Confirmar Pedido</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-checkout">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Finalizar Pedido</h3>
+            <button class="btn-fechar" onclick="fecharModal('modal-checkout')">&times;</button>
+        </div>
+
+        <label class="label-form">Seus Dados:</label>
+        <input type="text" id="cliente-nome" class="input-form" placeholder="Seu Nome completo">
+        <input type="tel" id="cliente-tel" class="input-form" placeholder="WhatsApp (DDD + Número)">
+
+        <label class="label-form">Como deseja receber?</label>
+        <div class="delivery-options">
+            <div class="delivery-option selected" id="opt-retirada" onclick="mudarEntrega('retirada')">
+                <i class="fas fa-store"></i> <small>Retirada</small>
+            </div>
+            <div class="delivery-option" id="opt-entrega" onclick="mudarEntrega('entrega')">
+                <i class="fas fa-motorcycle"></i> <small>Entrega</small>
+            </div>
+        </div>
+
+        <div id="div-endereco" class="hidden">
+            <div class="sub-options">
+                <div class="sub-option active" id="tab-manual" onclick="alternarModoEndereco('manual')">
+                    <i class="fas fa-pen"></i> Digitar
+                </div>
+                <div class="sub-option" id="tab-gps" onclick="alternarModoEndereco('gps')">
+                    <i class="fas fa-map-marker-alt"></i> Usar GPS
+                </div>
+            </div>
+
+            <label class="label-form">Selecione seu Bairro (Obrigatório):</label>
+            <select id="cliente-bairro" class="input-form" onchange="atualizarTotalCheckout()">
+                <option value="-1">Selecione...</option>
+            </select>
+            
+            <div id="campos-manual">
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 2;">
+                        <label class="label-form">Rua:</label>
+                        <input type="text" id="cliente-rua" class="input-form" placeholder="Nome da rua">
+                    </div>
+                    <div style="flex: 1;">
+                        <label class="label-form">Nº:</label>
+                        <input type="text" id="cliente-numero" class="input-form" placeholder="123">
+                    </div>
+                </div>
+                <label class="label-form">Ponto de Referência:</label>
+                <input type="text" id="cliente-ref" class="input-form" placeholder="Ex: Ao lado da padaria...">
+            </div>
+
+            <div id="campos-gps" class="hidden" style="text-align: center; margin-bottom: 20px;">
+                <p style="color:var(--text-sec); font-size:0.9rem; margin-bottom:15px;">
+                    Enviaremos sua localização exata pelo WhatsApp.
+                </p>
+                <button class="btn-acao btn-gps" onclick="capturarLocalizacao()">
+                    <i class="fas fa-crosshairs"></i> Detectar Localização Atual
+                </button>
+                <div id="status-gps" style="margin-top:10px; font-weight:600; color:var(--primary); display:none;">
+                    <i class="fas fa-check-circle"></i> Localização Capturada!
+                </div>
+            </div>
+        </div>
+
+        <div class="resumo-checkout">
+            <div class="resumo-linha">
+                <span>Subtotal:</span>
+                <span id="resumo-subtotal">R$ 0,00</span>
+            </div>
+            <div class="resumo-linha" id="linha-entrega" style="display:none;">
+                <span>Taxa de Entrega:</span>
+                <span id="resumo-taxa" style="color: var(--accent);">+ R$ 0,00</span>
+            </div>
+            <div class="resumo-total">
+                <span>TOTAL A PAGAR:</span>
+                <span id="resumo-total-final">R$ 0,00</span>
+            </div>
+        </div>
+
+        <label class="label-form">Forma de Pagamento:</label>
+        <select id="pagamento" class="input-form" onchange="mudarPagamento()">
+            <option value="Cartão" selected>Cartão de Crédito/Débito</option>
+            <option value="Pix">Pix</option>
+            <option value="Dinheiro">Dinheiro</option>
+        </select>
+
+        <div id="div-pix" class="hidden pix-info-box">
+            <p class="pix-text"><strong>Chave Pix (Celular):</strong> 27999024130</p>
+            <p class="pix-text"><strong>Nome:</strong> Regiana Ferri</p>
+            <p class="pix-alert"><i class="fas fa-exclamation-circle"></i> Envie o comprovante no WhatsApp.</p>
+        </div>
+
+        <div id="div-troco" class="hidden">
+            <label class="label-form">Troco para quanto?</label>
+            <input type="text" id="troco-valor" class="input-form" placeholder="Ex: R$ 50,00">
+        </div>
+
+        <button class="btn-acao" style="background:#25D366; color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);" onclick="finalizarPedidoZap()">
+            <i class="fab fa-whatsapp" style="font-size: 1.5rem"></i> Enviar Pedido no Zap
+        </button>
+    </div>
+</div>
+
+<div class="cart-bar" id="cart-bar" onclick="abrirCarrinho()">
+    <div class="cart-content">
+        <span><i class="fas fa-shopping-bag"></i> Ver Sacola</span>
+        <span id="cart-bar-total" style="font-weight: 800; color: var(--secondary);">R$ 0,00</span>
+    </div>
+</div>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script>
+    // --- DADOS DO CARDÁPIO ---
+    const cardapio = [
+        { cat: 'prato_dia', nome: 'Bolos Variados', desc: 'Mouse de limão, Mouse de maracuja, Brigadeiro, Ninho com NUTELA.', preco: 10.00, img: 'https://i.ibb.co/BHScSNLB/Whats-App-Image-2026-02-12-at-15-07-55.jpg' },
+        { cat: 'lanches', nome: 'Hambúrguer', desc: 'Bife de hambúrguer, alface, tomate, milho e batata palha.', preco: 15.00, img: 'https://i.ibb.co/84GQtVZV/unnamed-12.jpg' },
+        { cat: 'lanches', nome: 'X-Burguer', desc: 'Bife de hambúrguer, queijo, alface, tomate, milho e batata palha.', preco: 15.50, img: 'https://i.ibb.co/NdNfBd36/xburg.jpg' },
+        { cat: 'lanches', nome: 'X-Bacon', desc: 'Bife de hambúrguer, bacon, queijo, alface, tomate, milho e batata palha.', preco: 16.00, img: 'https://i.ibb.co/svzncM16/xbacon.jpg' },
+        { cat: 'lanches', nome: 'X-Egg Burgues', desc: 'Bife de hambúrguer, ovo, queijo, alface, tomate, milho e batata palha.', preco: 16.00, img: 'https://i.ibb.co/84zXNTjt/xegg.jpg' },
+        { cat: 'lanches', nome: 'X-Egg Bacon', desc: 'Bife de hambúrguer, bacon, ovo, queijo, alface, tomate, milho e batata palha.', preco: 17.00, img: 'https://i.ibb.co/tpgRST2Y/xeggbacon.jpg' },
+        { cat: 'lanches', nome: 'X-Tudo', desc: 'Bife de hambúrguer, bacon, ovo, queijo, presunto, alface, tomate, milho e batata palha.', preco: 18.00, img: 'https://i.ibb.co/Fbs2tw39/xtudo.jpg' },
+        { cat: 'lanches', nome: 'X-Americano', desc: '2 bifes de hambúrguer, ovo, queijo, presunto, alface, tomate, bacon, milho e batata palha.', preco: 20.00, img: 'https://i.ibb.co/3YYK6pR1/x-americano.jpg' },
+        { cat: 'porcoes', nome: 'Prato da Casa', desc: 'Frango passarinho e filé de boi c/ polenta, aipim, batata frita, anel de cebola.', preco: 110.00, img: 'https://i.ibb.co/PGwtTJZx/oooo.jpg' },
+        { cat: 'porcoes', nome: 'Carne Seca', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 90.00, img: '' },
+        { cat: 'porcoes', nome: 'File de Boi (Completo)', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 80.00, img: 'https://i.ibb.co/tw2C8yxM/unnamed.jpg' },
+        { cat: 'porcoes', nome: 'Filé de Boi', desc: 'Acompanha complementos (sem fritas).', preco: 60.00, img: 'https://i.ibb.co/4w8trBGy/unnamed-3.jpg' },
+        { cat: 'porcoes', nome: 'Frango a Passarinho (Completo)', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 80.00, img: 'https://i.ibb.co/PzDLHSs9/asdasdas.jpg' },
+        { cat: 'porcoes', nome: 'Frango a Passarinho (Simples)', desc: 'Sem fritas.', preco: 60.00, img: 'https://i.ibb.co/SDH7YtQP/asdasdas.jpg' },
+        { cat: 'porcoes', nome: 'Camarão (Completo)', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 90.00, img: 'https://i.ibb.co/FLzkRG3F/unnamed-4.jpg' },
+        { cat: 'porcoes', nome: 'Camarão (Simples)', desc: 'Sem fritas.', preco: 70.00, img: 'https://i.ibb.co/5tGX39B/unnamed-5.jpg' },
+        { cat: 'porcoes', nome: 'Pescada (Completa', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 80.00, img: '' },
+        { cat: 'porcoes', nome: 'Telha Camarão e Filé de Boi', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 120.00, img: 'https://i.ibb.co/V0YKffhH/Whats-App-Image-2026-02-09-at-22-08-42.jpg' },
+        { cat: 'porcoes', nome: 'Telha Camarão e Frango', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 120.00, img: 'https://i.ibb.co/N6FFJ2px/Whats-App-Image-2026-02-09-at-22-08-49.jpg' },
+        { cat: 'porcoes', nome: 'Telha Camarão e Carne Seca', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 130.00, img: '' },
+        { cat: 'porcoes', nome: 'Telha Camarão e Pescada', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 130.00, img: 'https://i.ibb.co/vvkMkFTx/Whats-App-Image-2026-02-09-at-22-08-47.jpg' },
+        { cat: 'porcoes', nome: 'Batata Frita', desc: 'Porção tradicional.', preco: 40.00, img: 'https://sachefmio.blob.core.windows.net/fotos/batata-frita-por%C3%A7%C3%A3o-b1d9fb3b-475e-4c98-9e6e-fc624b1c252c.jpg' },
+        { cat: 'porcoes', nome: 'Batata, Queijo e Bacon', desc: 'Batata frita especial.', preco: 50.00, img: 'https://i.ibb.co/SDdDQMhM/unnamed-1.jpg' },
+        { cat: 'porcoes', nome: 'Porção de Pastelzinho', desc: '16 unidades.', preco: 40.00, img: 'https://i.ibb.co/FL9D9DBS/Whats-App-Image-2026-02-09-at-22-08-51.jpg' },
+        { cat: 'porcoes', nome: 'Tábua de Frios', desc: 'Salaminho, ovo de codorna, azeitona, presunto e queijo.', preco: 50.00, img: 'https://i.ibb.co/FLFycsxK/Gemini-Generated-Image-dagcbfdagcbfdagc.png' },
+        { cat: 'pasteis', nome: 'Frango c/ Queijo', desc: 'Pastel frito na hora frito em oleo de algodão.', preco: 8.00, img: 'https://scontent.fvix7-1.fna.fbcdn.net/v/t1.6435-9/32699903_385066208662152_1491233669036113920_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=bgA-JcwaGcoQ7kNvwFmn3Y3&_nc_oc=AdkEQQHjQkZGE90nUXclzlWjLle_AmfHerYJDT59Xm_TNU6LARgEq61edyp5Mb9okDaMq7O3FDrH1XKBG9fCh8f3&_nc_zt=23&_nc_ht=scontent.fvix7-1.fna&_nc_gid=TgLaY_546wvYL_bs2XGPhw&oh=00_Afu6m3o9095aA3tmojJJzA9xnxRdnFq9McDkhrD3qL4Liw&oe=69B21416' },
+        { cat: 'pasteis', nome: 'Frango Puro', desc: 'Pastel frito na hora frito em oleo de algodão.', preco: 8.00, img: 'https://scontent.fvix7-1.fna.fbcdn.net/v/t1.6435-9/32699903_385066208662152_1491233669036113920_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=bgA-JcwaGcoQ7kNvwFmn3Y3&_nc_oc=AdkEQQHjQkZGE90nUXclzlWjLle_AmfHerYJDT59Xm_TNU6LARgEq61edyp5Mb9okDaMq7O3FDrH1XKBG9fCh8f3&_nc_zt=23&_nc_ht=scontent.fvix7-1.fna&_nc_gid=TgLaY_546wvYL_bs2XGPhw&oh=00_Afu6m3o9095aA3tmojJJzA9xnxRdnFq9McDkhrD3qL4Liw&oe=69B21416' },
+        { cat: 'pasteis', nome: 'Queijo e Presunto', desc: 'Pastel frito na hora frito em oleo de algodão.', preco: 8.00, img: 'https://scontent.fvix7-1.fna.fbcdn.net/v/t1.6435-9/32699903_385066208662152_1491233669036113920_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=bgA-JcwaGcoQ7kNvwFmn3Y3&_nc_oc=AdkEQQHjQkZGE90nUXclzlWjLle_AmfHerYJDT59Xm_TNU6LARgEq61edyp5Mb9okDaMq7O3FDrH1XKBG9fCh8f3&_nc_zt=23&_nc_ht=scontent.fvix7-1.fna&_nc_gid=TgLaY_546wvYL_bs2XGPhw&oh=00_Afu6m3o9095aA3tmojJJzA9xnxRdnFq9McDkhrD3qL4Liw&oe=69B21416' },
+        { cat: 'pasteis', nome: 'Queijo Puro', desc: 'Pastel frito na hora frito em oleo de algodão.', preco: 8.00, img: 'https://scontent.fvix7-1.fna.fbcdn.net/v/t1.6435-9/32699903_385066208662152_1491233669036113920_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=bgA-JcwaGcoQ7kNvwFmn3Y3&_nc_oc=AdkEQQHjQkZGE90nUXclzlWjLle_AmfHerYJDT59Xm_TNU6LARgEq61edyp5Mb9okDaMq7O3FDrH1XKBG9fCh8f3&_nc_zt=23&_nc_ht=scontent.fvix7-1.fna&_nc_gid=TgLaY_546wvYL_bs2XGPhw&oh=00_Afu6m3o9095aA3tmojJJzA9xnxRdnFq9McDkhrD3qL4Liw&oe=69B21416' },
+        { cat: 'pasteis', nome: 'Carne Pura', desc: 'Pastel frito na hora frito em oleo de algodão.', preco: 8.00, img: 'https://scontent.fvix7-1.fna.fbcdn.net/v/t1.6435-9/32699903_385066208662152_1491233669036113920_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=bgA-JcwaGcoQ7kNvwFmn3Y3&_nc_oc=AdkEQQHjQkZGE90nUXclzlWjLle_AmfHerYJDT59Xm_TNU6LARgEq61edyp5Mb9okDaMq7O3FDrH1XKBG9fCh8f3&_nc_zt=23&_nc_ht=scontent.fvix7-1.fna&_nc_gid=TgLaY_546wvYL_bs2XGPhw&oh=00_Afu6m3o9095aA3tmojJJzA9xnxRdnFq9McDkhrD3qL4Liw&oe=69B21416' },
+        { cat: 'pasteis', nome: 'Goiaba c/ Queijo', desc: 'Pastel doce frito em oleo de algodão.', preco: 8.00, img: 'https://scontent.fvix7-1.fna.fbcdn.net/v/t1.6435-9/32699903_385066208662152_1491233669036113920_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=bgA-JcwaGcoQ7kNvwFmn3Y3&_nc_oc=AdkEQQHjQkZGE90nUXclzlWjLle_AmfHerYJDT59Xm_TNU6LARgEq61edyp5Mb9okDaMq7O3FDrH1XKBG9fCh8f3&_nc_zt=23&_nc_ht=scontent.fvix7-1.fna&_nc_gid=TgLaY_546wvYL_bs2XGPhw&oh=00_Afu6m3o9095aA3tmojJJzA9xnxRdnFq9McDkhrD3qL4Liw&oe=69B21416' },
+        { cat: 'pasteis', nome: 'Banana c/ Queijo', desc: 'Pastel doce frito em oleo de algodão.', preco: 8.00, img: 'https://scontent.fvix7-1.fna.fbcdn.net/v/t1.6435-9/32699903_385066208662152_1491233669036113920_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=bgA-JcwaGcoQ7kNvwFmn3Y3&_nc_oc=AdkEQQHjQkZGE90nUXclzlWjLle_AmfHerYJDT59Xm_TNU6LARgEq61edyp5Mb9okDaMq7O3FDrH1XKBG9fCh8f3&_nc_zt=23&_nc_ht=scontent.fvix7-1.fna&_nc_gid=TgLaY_546wvYL_bs2XGPhw&oh=00_Afu6m3o9095aA3tmojJJzA9xnxRdnFq9McDkhrD3qL4Liw&oe=69B21416' },
+        { cat: 'pasteis', nome: 'Carne c/ Queijo', desc: 'Pastel na hora frito em oleo de algodão.', preco: 8.00, img: 'https://scontent.fvix7-1.fna.fbcdn.net/v/t1.6435-9/32699903_385066208662152_1491233669036113920_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=127cfc&_nc_ohc=bgA-JcwaGcoQ7kNvwFmn3Y3&_nc_oc=AdkEQQHjQkZGE90nUXclzlWjLle_AmfHerYJDT59Xm_TNU6LARgEq61edyp5Mb9okDaMq7O3FDrH1XKBG9fCh8f3&_nc_zt=23&_nc_ht=scontent.fvix7-1.fna&_nc_gid=TgLaY_546wvYL_bs2XGPhw&oh=00_Afu6m3o9095aA3tmojJJzA9xnxRdnFq9McDkhrD3qL4Liw&oe=69B21416' },
+        { cat: 'caldos', nome: 'Dobradinha', desc: 'Caldo quente.', preco: 25.00, img: 'https://i.ibb.co/Yz84r70/Whats-App-Image-2026-02-09-at-22-08-44.jpg' },
+        { cat: 'caldos', nome: 'Caldo Verde', desc: 'Caldo quente.', preco: 25.00, img: 'https://i.ibb.co/C3pSwBkv/Whats-App-Image-2026-02-10-at-01-03-29.jpg' },
+        { cat: 'bebidas', nome: 'Coca-Cola 1.5L', desc: 'Garrafa.', preco: 11.00, img: 'https://www.redesuperbom.com.br/media/produtos/536x536/59092_barcelos_refrigerante-cola_refrigerante-coca-cola-1-5l-original-gelado.jpg' },
+        { cat: 'bebidas', nome: 'Coca-Cola 2L', desc: 'Garrafa.', preco: 13.00, img: 'https://www.redesuperbom.com.br/media/produtos/536x536/59092_barcelos_refrigerante-cola_refrigerante-coca-cola-1-5l-original-gelado.jpg' },
+        { cat: 'bebidas', nome: 'Coca-Cola 600ml', desc: 'Garrafa.', preco: 8.00, img: 'https://www.redesuperbom.com.br/uploads/produtos/48014_barcelos_refrigerante-cola_refrigerante-coca-cola-600ml-pet-gelado.jpg' },
+        { cat: 'bebidas', nome: 'Coca-Cola Lata', desc: '350ml gelada.', preco: 6.00, img: 'https://img.cdndsgni.com/preview/10000392.jpg' },
+        { cat: 'bebidas', nome: 'Uai Sabores', desc: 'Refrigerante.', preco: 7.00, img: 'https://instadelivery-public.nyc3.cdn.digitaloceanspaces.com/itens/1717456334665e4dcec1d35_75_75.jpeg' },
+        { cat: 'bebidas', nome: 'Uai 600ml', desc: 'Refrigerante.', preco: 6.00, img: 'https://www.extrabom.com.br/media/produtos/350x350/63629_20180601171239_thumb_63629REFRIG2UAI600MLLARANJA.jpg_.jpeg' },
+        { cat: 'bebidas', nome: 'Copão', desc: '700ml.', preco: 20.00, img: 'https://i.ibb.co/GvmBVzsx/Whats-App-Image-2026-02-09-at-22-42-54.jpg' },
+        { cat: 'bebidas', nome: 'Red Bull', desc: 'Energético.', preco: 15.00, img: 'https://m.media-amazon.com/images/I/61+nTaXiDLL._AC_SY679_.jpg' },
+        { cat: 'bebidas', nome: 'Taça de Vinho', desc: 'Vinho da casa.', preco: 10.00, img: 'https://images.tcdn.com.br/img/img_prod/682190/taca_de_cristal_event_burgundy_para_vinho_740ml_ruvolo_80286_1_da18ef763d1d3031881f3d4207b79924.jpg' },
+        { cat: 'bebidas', nome: 'Caipirinha', desc: 'Drink.', preco: 15.00, img: 'https://static.wixstatic.com/media/49591c_24539871c7ff486db0be858b5f3475e2~mv2.jpg/v1/fill/w_568,h_378,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/49591c_24539871c7ff486db0be858b5f3475e2~mv2.jpg' },
+        { cat: 'bebidas', nome: 'Caipivodka', desc: 'Drink.', preco: 15.00, img: 'https://static.wixstatic.com/media/49591c_24539871c7ff486db0be858b5f3475e2~mv2.jpg/v1/fill/w_568,h_378,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/49591c_24539871c7ff486db0be858b5f3475e2~mv2.jpg' },
+        { cat: 'bebidas', nome: 'Água Mineral', desc: 'Sem gás.', preco: 3.00, img: 'https://fontagua.com.br/wp-content/uploads/2019/02/splash_15l.jpg' },
+        { cat: 'sucos', nome: 'Suco para Viagem (500ml)', desc: 'Sabores: Abacaxi, Acerola, Cacau, Cupuaçu, Goiaba, Laranja, Graviola, Manga, Maracujá, Morango, Uva.', preco: 11.00, img: 'https://i.ibb.co/XrFp7sJY/unnamed-2.jpg' }
+    ];
+
+    // --- ADICIONAIS ---
+    const opcionais = {
+        'lanches': [
+            { nome: 'Bacon Extra', preco: 4.00 },
+            { nome: 'Queijo Extra', preco: 4.00 },
+            { nome: 'Ovo Extra', preco: 4.00 },
+            { nome: 'Hambúrguer Extra', preco: 4.00 },
+        ]
+    };
+
+    // --- LISTA DE BAIRROS E TAXAS ---
+    const bairros = [
+        { nome: "Castelo Branco", taxa: 0.00 },
+        { nome: "Bela Vista", taxa: 0.00 },
+        { nome: "Rio Marinho", taxa: 0.00 },
+        { nome: "Padre Gabriel", taxa: 0.00 },
+        { nome: "Jardim de Alá", taxa: 0.00 },
+        { nome: "Santa Paula", taxa: 0.00 },
+        { nome: "Jardim Campo Grande", taxa: 0.00 },
+        { nome: "Outro Bairro (Consultar)", taxa: 0.00 }
+    ];
+
+    // ESTADO DO APLICATIVO
+    let carrinho = [];
+    let produtoAtual = null;
+    let quantidadeAtual = 1;
+    let tipoEntrega = 'retirada'; 
+    let modoEndereco = 'manual'; // 'manual' ou 'gps'
+    let taxaEntregaAtual = 0.00;
+    let linkGPS = ""; // Armazena o link do maps
+
+    // --- CARREGAR DADOS SALVOS ---
+    function carregarCarrinhoSalvo() {
+        const salvo = localStorage.getItem('pastelanches_cart');
+        if (salvo) {
+            carrinho = JSON.parse(salvo);
+            atualizarCarrinhoUI();
+        }
+    }
+    
+    function salvarCarrinho() {
+        localStorage.setItem('pastelanches_cart', JSON.stringify(carrinho));
+    }
+
+    // --- NOVIDADE: CARREGAR DADOS DO CLIENTE ---
+    function carregarDadosCliente() {
+        const dados = JSON.parse(localStorage.getItem('pastelanches_cliente'));
+        if(dados) {
+            document.getElementById('cliente-nome').value = dados.nome || '';
+            document.getElementById('cliente-tel').value = dados.tel || '';
+            document.getElementById('cliente-rua').value = dados.rua || '';
+            document.getElementById('cliente-numero').value = dados.numero || '';
+            document.getElementById('cliente-ref').value = dados.ref || '';
+            
+            // Tenta selecionar o bairro
+            if(dados.bairroIdx) {
+                document.getElementById('cliente-bairro').value = dados.bairroIdx;
+            }
+        }
+    }
+
+    // --- NOVIDADE: SALVAR DADOS DO CLIENTE ---
+    function salvarDadosCliente() {
+        const dados = {
+            nome: document.getElementById('cliente-nome').value,
+            tel: document.getElementById('cliente-tel').value,
+            rua: document.getElementById('cliente-rua').value,
+            numero: document.getElementById('cliente-numero').value,
+            ref: document.getElementById('cliente-ref').value,
+            bairroIdx: document.getElementById('cliente-bairro').value
+        };
+        localStorage.setItem('pastelanches_cliente', JSON.stringify(dados));
+    }
+
+    // TOAST NOTIFICATION
+    function showToast(msg, type = 'success') {
+        Toastify({
+            text: msg, duration: 3000, gravity: "top", position: "center", 
+            style: { background: type === 'success' ? "#00e676" : "#ff1744", color: type === 'success' ? "#000" : "#fff", boxShadow: "0 5px 15px rgba(0,0,0,0.3)" },
+            stopOnFocus: true, 
+        }).showToast();
+    }
+
+    function getTempoEstimado(categoria) {
+        if(categoria === 'prato_dia') return 'Pronto';
+        if(categoria === 'lanches' || categoria === 'pasteis') return '30 min';
+        if(categoria === 'porcoes') return '40 a 90 min';
+        if(categoria === 'caldos') return '30 min';
+        return '';
+    }
+
+    function renderizarCardapio(filtro = '') {
+        const container = document.getElementById('cardapio-lista');
+        container.innerHTML = '';
+
+        const categorias = {
+            'prato_dia': '🍛 Bolos do Dia',
+            'lanches': '🍔 Lanches',
+            'porcoes': '🍟 Porções',
+            'pasteis': '🥟 Pastéis',
+            'caldos': '🍲 Caldos',
+            'bebidas': '🥤 Bebidas',
+            'sucos': '🍹 Sucos'
+        };
+
+        for (let [key, titulo] of Object.entries(categorias)) {
+            const itens = cardapio.filter(i => i.cat === key && i.nome.toLowerCase().includes(filtro.toLowerCase()));
+            if(itens.length === 0) continue;
+
+            let html = `<div id="cat-${key}"><h2 class="secao-titulo">${titulo}</h2>`;
+            itens.forEach((item) => {
+                const realIndex = cardapio.indexOf(item);
+                const imgStyle = item.img ? `background-image: url('${item.img}')` : 'background-color: var(--surface-light)';
+                const tempo = getTempoEstimado(item.cat);
+                const badgeTempo = tempo ? `<div class="badge-tempo"><i class="far fa-clock"></i> ${tempo}</div>` : '';
+
+                html += `
+                <div class="produto-card" onclick="abrirModalProduto(${realIndex})">
+                    <div class="prod-info">
+                        <div class="prod-nome">${item.nome}</div>
+                        <div class="prod-desc">${item.desc}</div>
+                        <div class="prod-preco">R$ ${item.preco.toFixed(2).replace('.', ',')}</div>
+                        ${badgeTempo}
+                    </div>
+                    <div class="prod-img" style="${imgStyle}"></div>
+                </div>`;
+            });
+            html += `</div>`;
+            container.innerHTML += html;
+        }
+    }
+
+    function filtrarCardapio() {
+        renderizarCardapio(document.getElementById('search-input').value);
+    }
+
+    // MODAL DE PRODUTO
+    function abrirModalProduto(index) {
+        produtoAtual = cardapio[index];
+        quantidadeAtual = 1;
+
+        document.getElementById('modal-qtd').innerText = "1"; 
+        document.getElementById('modal-titulo').innerText = produtoAtual.nome;
+        document.getElementById('modal-desc').innerText = produtoAtual.desc;
+        document.getElementById('modal-preco').innerText = `R$ ${produtoAtual.preco.toFixed(2).replace('.', ',')}`;
+        document.getElementById('modal-obs').value = '';
+        
+        if(produtoAtual.cat === 'sucos') {
+            document.getElementById('modal-obs').placeholder = "Digite o sabor aqui (Ex: Morango)...";
+        } else {
+            document.getElementById('modal-obs').placeholder = "Ex: Sem cebola...";
+        }
+
+        const wrapper = document.getElementById('wrapper-adicionais');
+        const lista = document.getElementById('lista-adicionais');
+        lista.innerHTML = ''; 
+
+        if(opcionais[produtoAtual.cat]) {
+            wrapper.style.display = 'block';
+            opcionais[produtoAtual.cat].forEach((add, idx) => {
+                lista.innerHTML += `
+                <div class="adicional-item">
+                    <label class="adicional-label" for="add-${idx}">
+                        <input type="checkbox" id="add-${idx}" class="adicional-checkbox" value="${idx}" onchange="atualizarTotalModal()">
+                        ${add.nome} (+ R$ ${add.preco.toFixed(2).replace('.', ',')})
+                    </label>
+                </div>`;
+            });
+        } else {
+            wrapper.style.display = 'none';
+        }
+
+        atualizarTotalModal();
+        document.getElementById('modal-produto').classList.add('open');
+    }
+
+    function alterarQtd(val) {
+        if (quantidadeAtual + val >= 1) {
+            quantidadeAtual += val;
+            document.getElementById('modal-qtd').innerText = quantidadeAtual;
+            atualizarTotalModal();
+        }
+    }
+
+    function calcularTotalAdicionais() {
+        let totalAdd = 0;
+        const checkboxes = document.querySelectorAll('.adicional-checkbox:checked');
+        if(opcionais[produtoAtual.cat]) {
+            checkboxes.forEach(chk => {
+                const idx = parseInt(chk.value);
+                totalAdd += opcionais[produtoAtual.cat][idx].preco;
+            });
+        }
+        return totalAdd;
+    }
+
+    function getAdicionaisSelecionados() {
+        let selecionados = [];
+        const checkboxes = document.querySelectorAll('.adicional-checkbox:checked');
+        if(opcionais[produtoAtual.cat]) {
+            checkboxes.forEach(chk => {
+                const idx = parseInt(chk.value);
+                selecionados.push(opcionais[produtoAtual.cat][idx]);
+            });
+        }
+        return selecionados;
+    }
+
+    function atualizarTotalModal() {
+        const precoBase = produtoAtual.preco;
+        const precoAdd = calcularTotalAdicionais();
+        const total = (precoBase + precoAdd) * quantidadeAtual;
+        document.getElementById('modal-btn-total').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+    }
+
+    function adicionarAoCarrinho() {
+        const obs = document.getElementById('modal-obs').value;
+        const adds = getAdicionaisSelecionados();
+        const precoAdd = calcularTotalAdicionais();
+        
+        const item = {
+            ...produtoAtual,
+            qtd: quantidadeAtual,
+            obs: obs,
+            adicionais: adds, 
+            total: (produtoAtual.preco + precoAdd) * quantidadeAtual
+        };
+        
+        carrinho.push(item);
+        salvarCarrinho(); // Salva no LocalStorage
+        fecharModal('modal-produto');
+        atualizarCarrinhoUI();
+        showToast("Adicionado à sacola!");
+    }
+
+    function atualizarCarrinhoUI() {
+        const cartBar = document.getElementById('cart-bar');
+        const lista = document.getElementById('lista-carrinho');
+        const totalEl = document.getElementById('total-carrinho');
+        const barTotalEl = document.getElementById('cart-bar-total');
+
+        const totalGeral = carrinho.reduce((acc, item) => acc + item.total, 0);
+
+        if (carrinho.length > 0) {
+            cartBar.classList.add('visible');
+            barTotalEl.innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+        } else {
+            cartBar.classList.remove('visible');
+            fecharModal('modal-carrinho');
+            fecharModal('modal-checkout');
+        }
+
+        lista.innerHTML = '';
+        carrinho.forEach((item, index) => {
+            let htmlAdicionais = '';
+            if(item.adicionais && item.adicionais.length > 0) {
+                const nomes = item.adicionais.map(a => `+ ${a.nome}`).join('<br>');
+                htmlAdicionais = `<div style="color:var(--primary); font-size:0.8rem; margin-top:2px">${nomes}</div>`;
+            }
+
+            lista.innerHTML += `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <strong>${item.qtd}x ${item.nome}</strong>
+                    ${htmlAdicionais}
+                    <span style="color:var(--text-sec); font-size:0.8rem; display:block; margin-top:2px">${item.obs ? 'Obs: ' + item.obs : ''}</span>
+                </div>
+                <div style="text-align:right">
+                    <div style="font-weight:bold; color: var(--text-main);">R$ ${item.total.toFixed(2).replace('.', ',')}</div>
+                    <div class="cart-item-remove" onclick="removerDoCarrinho(${index})">Remover</div>
+                </div>
+            </div>`;
+        });
+        totalEl.innerText = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+    }
+
+    function removerDoCarrinho(index) {
+        carrinho.splice(index, 1);
+        salvarCarrinho(); // Atualiza LocalStorage
+        atualizarCarrinhoUI();
+        showToast("Item removido.", "error");
+    }
+
+    function abrirCarrinho() {
+        document.getElementById('modal-carrinho').classList.add('open');
+    }
+
+    // CHECKOUT
+    function carregarBairros() {
+        const select = document.getElementById('cliente-bairro');
+        const valorAntigo = select.value;
+        select.innerHTML = '<option value="-1">Selecione seu Bairro...</option>';
+        bairros.forEach((bairro, index) => {
+            select.innerHTML += `<option value="${index}">${bairro.nome} (+ R$ ${bairro.taxa.toFixed(2).replace('.', ',')})</option>`;
+        });
+        if(valorAntigo !== '-1') select.value = valorAntigo;
+    }
+
+    function abrirCheckout() {
+        fecharModal('modal-carrinho');
+        carregarBairros(); 
+        carregarDadosCliente(); // PREENCHE OS CAMPOS SALVOS
+        atualizarTotalCheckout();
+        document.getElementById('modal-checkout').classList.add('open');
+    }
+
+    function atualizarTotalCheckout() {
+        const subtotal = carrinho.reduce((acc, item) => acc + item.total, 0);
+        
+        // Lógica da Taxa
+        let taxa = 0;
+        const bairroIndex = document.getElementById('cliente-bairro').value;
+        if(tipoEntrega === 'entrega' && bairroIndex != -1) {
+            taxa = bairros[bairroIndex].taxa;
+        }
+
+        taxaEntregaAtual = taxa;
+
+        const totalFinal = subtotal + taxa;
+
+        document.getElementById('resumo-subtotal').innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+        document.getElementById('resumo-taxa').innerText = `+ R$ ${taxa.toFixed(2).replace('.', ',')}`;
+        document.getElementById('resumo-total-final').innerText = `R$ ${totalFinal.toFixed(2).replace('.', ',')}`;
+    }
+
+    function mudarEntrega(tipo) {
+        tipoEntrega = tipo;
+        document.getElementById('opt-retirada').classList.remove('selected');
+        document.getElementById('opt-entrega').classList.remove('selected');
+        
+        const divEnd = document.getElementById('div-endereco');
+        const linhaEntrega = document.getElementById('linha-entrega');
+
+        if (tipo === 'retirada') {
+            document.getElementById('opt-retirada').classList.add('selected');
+            divEnd.classList.add('hidden');
+            linhaEntrega.style.display = 'none';
+        } else {
+            document.getElementById('opt-entrega').classList.add('selected');
+            divEnd.classList.remove('hidden');
+            linhaEntrega.style.display = 'flex';
+        }
+        atualizarTotalCheckout();
+    }
+    
+    // --- NOVIDADE: ALTERNAR ENTRE MANUAL E GPS ---
+    function alternarModoEndereco(modo) {
+        modoEndereco = modo;
+        const tabManual = document.getElementById('tab-manual');
+        const tabGps = document.getElementById('tab-gps');
+        const divManual = document.getElementById('campos-manual');
+        const divGps = document.getElementById('campos-gps');
+
+        if(modo === 'manual') {
+            tabManual.classList.add('active');
+            tabGps.classList.remove('active');
+            divManual.classList.remove('hidden');
+            divGps.classList.add('hidden');
+        } else {
+            tabGps.classList.add('active');
+            tabManual.classList.remove('active');
+            divGps.classList.remove('hidden');
+            divManual.classList.add('hidden');
+        }
+    }
+
+    // --- NOVIDADE: FUNÇÃO GPS ---
+    function capturarLocalizacao() {
+        if (!navigator.geolocation) {
+            showToast("Seu navegador não suporta GPS.", "error");
+            return;
+        }
+        
+        document.querySelector('.btn-gps').innerText = "Aguarde...";
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                linkGPS = `https://www.google.com/maps?q=${lat},${lng}`;
+                
+                document.getElementById('status-gps').style.display = 'block';
+                document.querySelector('.btn-gps').innerText = "Atualizar Localização";
+                showToast("Localização capturada!");
+            },
+            () => {
+                showToast("Erro ao pegar localização. Ative o GPS!", "error");
+                document.querySelector('.btn-gps').innerText = "Tentar Novamente";
+            }
+        );
+    }
+
+    function mudarPagamento() {
+        const tipo = document.getElementById('pagamento').value;
+        const divPix = document.getElementById('div-pix');
+        const divTroco = document.getElementById('div-troco');
+
+        divPix.classList.add('hidden');
+        divTroco.classList.add('hidden');
+
+        if (tipo === 'Pix') divPix.classList.remove('hidden');
+        else if (tipo === 'Dinheiro') divTroco.classList.remove('hidden');
+    }
+
+    function fecharModal(id) {
+        document.getElementById(id).classList.remove('open');
+    }
+
+    function finalizarPedidoZap() {
+        if (carrinho.length === 0) return;
+
+        const nome = document.getElementById('cliente-nome').value;
+        const telefoneUser = document.getElementById('cliente-tel').value;
+        const pagamento = document.getElementById('pagamento').value;
+        const troco = document.getElementById('troco-valor').value;
+
+        // Validação
+        if(!nome || !telefoneUser) {
+            showToast("Preencha Nome e Telefone!", "error");
+            return;
+        }
+        
+        // SALVAR DADOS ANTES DE ENVIAR
+        salvarDadosCliente();
+        
+        let enderecoTexto = '';
+        
+        if(tipoEntrega === 'entrega') {
+            const bairroIdx = document.getElementById('cliente-bairro').value;
+            
+            // Valida Bairro (sempre obrigatório na entrega)
+            if(bairroIdx == -1) {
+                showToast("Selecione seu Bairro para calcular a taxa!", "error");
+                return;
+            }
+
+            if(modoEndereco === 'manual') {
+                // Valida Campos Manuais
+                const rua = document.getElementById('cliente-rua').value;
+                const num = document.getElementById('cliente-numero').value;
+                const ref = document.getElementById('cliente-ref').value;
+                
+                if(!rua || !num) {
+                    showToast("Preencha a Rua e o Número!", "error");
+                    return;
+                }
+                enderecoTexto = `📍 *Endereço:*\n${rua}, Nº ${num} - ${bairros[bairroIdx].nome}\n(Ref: ${ref})`;
+            } else {
+                // Valida GPS
+                if(!linkGPS) {
+                    showToast("Clique em 'Detectar Localização' primeiro!", "error");
+                    return;
+                }
+                enderecoTexto = `📍 *Localização GPS:*\nBairro: ${bairros[bairroIdx].nome}\nLink: ${linkGPS}`;
+            }
+        }
+
+        let mensagem = `*NOVO PEDIDO - PASTELANCHES* 🍔\n`;
+        mensagem += `--------------------------\n`;
+        mensagem += `*Cliente:* ${nome}\n`;
+        mensagem += `*Tel:* ${telefoneUser}\n`;
+        mensagem += `*Tipo:* ${tipoEntrega === 'entrega' ? '🛵 ENTREGA' : '🛍️ RETIRADA'}\n`;
+        
+        if(tipoEntrega === 'entrega') {
+            mensagem += `${enderecoTexto}\n`;
+        }
+        mensagem += `--------------------------\n\n`;
+
+        carrinho.forEach(item => {
+            mensagem += `*${item.qtd}x ${item.nome}*\n`;
+            if(item.adicionais && item.adicionais.length > 0) {
+                item.adicionais.forEach(add => {
+                    mensagem += `   + ${add.nome}\n`;
+                });
+            }
+            if (item.obs) mensagem += `_Obs: ${item.obs}_\n`;
+            mensagem += `R$ ${item.total.toFixed(2).replace('.', ',')}\n\n`;
+        });
+
+        const subtotal = carrinho.reduce((acc, item) => acc + item.total, 0);
+        const totalFinal = subtotal + taxaEntregaAtual;
+
+        mensagem += `--------------------------\n`;
+        mensagem += `Subtotal: R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+        if(tipoEntrega === 'entrega') {
+            mensagem += `Taxa Entrega: R$ ${taxaEntregaAtual.toFixed(2).replace('.', ',')}\n`;
+        }
+        mensagem += `*TOTAL FINAL: R$ ${totalFinal.toFixed(2).replace('.', ',')}*\n`;
+        mensagem += `*Pagamento:* ${pagamento}\n`;
+        
+        if(pagamento === "Dinheiro" && troco) {
+            mensagem += `*Troco para:* ${troco}\n`;
+        } else if (pagamento === "Pix") {
+            mensagem += `_(PIX: 27999024130 - Regiana Ferri - Enviar Comprovante do pagamento)_\n`;
+        }
+
+        const telefoneLoja = "5527999024130"; 
+        window.open(`https://wa.me/${telefoneLoja}?text=${encodeURIComponent(mensagem)}`, '_blank');
+        
+        // Limpa carrinho e memória do carrinho (mas mantém dados do cliente)
+        carrinho = [];
+        localStorage.removeItem('pastelanches_cart');
+        atualizarCarrinhoUI();
+        fecharModal('modal-checkout');
+    }
+
+    function verificarHorario() {
+        const hora = new Date().getHours();
+        const statusEl = document.getElementById('status-loja');
+        // Ajuste aqui o horário se precisar (ex: 18h as 23h)
+        if (hora >= 18 && hora < 23) {
+            statusEl.innerText = "Aberto Agora";
+            statusEl.classList.remove('fechado');
+        } else {
+            statusEl.innerText = "Fechado (Abre 18h)";
+            statusEl.classList.add('fechado');
+        }
+    }
+
+    // --- FUNÇÃO DE TEMA ---
+    function alternarTema() {
+        document.body.classList.toggle('light-mode');
+        const icon = document.querySelector('#theme-btn i');
+        
+        if (document.body.classList.contains('light-mode')) {
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+            localStorage.setItem('tema', 'light');
+        } else {
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+            localStorage.setItem('tema', 'dark');
+        }
+    }
+
+    function carregarTema() {
+        const temaSalvo = localStorage.getItem('tema');
+        const icon = document.querySelector('#theme-btn i');
+        
+        if (temaSalvo === 'light') {
+            document.body.classList.add('light-mode');
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+        }
+    }
+
+    window.onload = function() {
+        carregarTema();
+        renderizarCardapio();
+        verificarHorario();
+        carregarCarrinhoSalvo(); // Carrega se tiver algo salvo
+    }
+</script>
+
+</body>
+</html>
