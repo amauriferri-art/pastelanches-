@@ -627,14 +627,12 @@
         { cat: 'lanches', nome: 'X-Tudo', desc: 'Bife de hambúrguer, bacon, ovo, queijo, presunto, alface, tomate, milho e batata palha.', preco: 18.00, img: 'https://i.ibb.co/Fbs2tw39/xtudo.jpg' },
         { cat: 'lanches', nome: 'X-Americano', desc: '2 bifes de hambúrguer, ovo, queijo, presunto, alface, tomate, bacon, milho e batata palha.', preco: 20.00, img: 'https://i.ibb.co/3YYK6pR1/x-americano.jpg' },
         { cat: 'porcoes', nome: 'Prato da Casa', desc: 'Frango passarinho e filé de boi c/ polenta, aipim, batata frita, anel de cebola.', preco: 110.00, img: 'https://i.ibb.co/PGwtTJZx/oooo.jpg' },
-        { cat: 'porcoes', nome: 'Carne Seca', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 90.00, img: '' },
         { cat: 'porcoes', nome: 'File de Boi (Completo)', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 80.00, img: 'https://i.ibb.co/tw2C8yxM/unnamed.jpg' },
         { cat: 'porcoes', nome: 'Filé de Boi', desc: 'Acompanha complementos (sem fritas).', preco: 60.00, img: 'https://i.ibb.co/4w8trBGy/unnamed-3.jpg' },
         { cat: 'porcoes', nome: 'Frango a Passarinho (Completo)', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 80.00, img: 'https://i.ibb.co/PzDLHSs9/asdasdas.jpg' },
         { cat: 'porcoes', nome: 'Frango a Passarinho (Simples)', desc: 'Sem fritas.', preco: 60.00, img: 'https://i.ibb.co/SDH7YtQP/asdasdas.jpg' },
         { cat: 'porcoes', nome: 'Camarão (Completo)', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 90.00, img: 'https://i.ibb.co/FLzkRG3F/unnamed-4.jpg' },
         { cat: 'porcoes', nome: 'Camarão (Simples)', desc: 'Sem fritas.', preco: 70.00, img: 'https://i.ibb.co/5tGX39B/unnamed-5.jpg' },
-        { cat: 'porcoes', nome: 'Pescada (Completa', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 80.00, img: '' },
         { cat: 'porcoes', nome: 'Telha Camarão e Filé de Boi', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 120.00, img: 'https://i.ibb.co/V0YKffhH/Whats-App-Image-2026-02-09-at-22-08-42.jpg' },
         { cat: 'porcoes', nome: 'Telha Camarão e Frango', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 120.00, img: 'https://i.ibb.co/N6FFJ2px/Whats-App-Image-2026-02-09-at-22-08-49.jpg' },
         { cat: 'porcoes', nome: 'Telha Camarão e Carne Seca', desc: 'Com polenta, aipim, batata frita, anel de cebola.', preco: 130.00, img: '' },
@@ -691,7 +689,7 @@
     ];
 
     // ESTADO DO APLICATIVO
-    let lojaAberta = false; // Controle de abertura
+    let lojaAberta = false; 
     let carrinho = [];
     let produtoAtual = null;
     let quantidadeAtual = 1;
@@ -808,10 +806,13 @@
     // MODAL DE PRODUTO
     function abrirModalProduto(index) {
         // --- BLOQUEIO DE HORÁRIO ---
+        // Removido o bloqueio para permitir teste
+        /*
         if (!lojaAberta) {
             showToast("Estamos fechados! Atendemos de Terça a Domingo, das 18h às 23h.", "error");
             return;
         }
+        */
         // ---------------------------
 
         produtoAtual = cardapio[index];
@@ -1087,10 +1088,13 @@
     function finalizarPedidoZap() {
         // --- BLOQUEIO DE HORÁRIO ---
         verificarHorario(); 
+        
+        /* BLOQUEIO REMOVIDO
         if (!lojaAberta) {
             showToast("A loja acabou de fechar! Não é possível enviar o pedido.", "error");
             return;
         }
+        */
         // ---------------------------
 
         if (carrinho.length === 0) return;
@@ -1198,36 +1202,30 @@
         const statusEl = document.getElementById('status-loja');
         const listaProdutos = document.getElementById('cardapio-lista');
 
-        // REGRA: 
-        // 1. Aberto se o dia NÃO for Segunda (dia !== 1)
-        // 2. E se o horário for maior ou igual a 18 E menor que 23
+        // REGRA DE TEXTO (para saber se é hora de expediente real)
         const diaFuncionamento = dia !== 1; 
         const horarioFuncionamento = hora >= 18 && hora < 23;
 
+        // --- MUDANÇA PRINCIPAL AQUI ---
+        // Força a loja como "aberta" funcionalmente para permitir cliques
+        lojaAberta = true; 
+
         if (diaFuncionamento && horarioFuncionamento) {
-            lojaAberta = true;
             statusEl.innerText = "Aberto Agora";
             statusEl.classList.remove('fechado');
-            
-            // Visual do cardápio Normal
-            listaProdutos.style.opacity = "1";
-            listaProdutos.style.filter = "none";
         } else {
-            lojaAberta = false;
-            
-            // Mensagem personalizada dependendo do motivo
+            // Apenas altera o TEXTO, mas mantém o site funcional
             if (!diaFuncionamento) {
-                statusEl.innerText = "Fechado (Folga)";
+                statusEl.innerText = "Fechado (Folga) - Modo Livre";
             } else {
-                statusEl.innerText = "Fechado (Abre 18h)";
+                statusEl.innerText = "Fechado (Abre 18h) - Modo Livre";
             }
-            
             statusEl.classList.add('fechado');
-
-            // Deixa o cardápio "apagado" (cinza e transparente)
-            listaProdutos.style.opacity = "0.5";
-            listaProdutos.style.filter = "grayscale(100%)";
         }
+
+        // Garante que o visual NUNCA fique preto e branco
+        listaProdutos.style.opacity = "1";
+        listaProdutos.style.filter = "none";
     }
 
     // --- FUNÇÃO DE TEMA ---
