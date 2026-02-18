@@ -453,7 +453,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3 id="modal-titulo">Nome do Produto</h3>
-            <button class="btn-fechar" onclick="fecharModal('modal-produto')">&times;</button>
+            <button class="btn-fechar" onclick="fecharModal('modal-produto')">×</button>
         </div>
         <p id="modal-desc" style="color:var(--text-sec); margin-bottom:15px; line-height: 1.5;">Descrição...</p>
         <p id="modal-preco" style="color:var(--secondary); font-weight:800; font-size:1.8rem; text-shadow: 0 0 10px rgba(255, 234, 0, 0.3)">R$ 0,00</p>
@@ -486,7 +486,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3>Sua Sacola</h3>
-            <button class="btn-fechar" onclick="fecharModal('modal-carrinho')">&times;</button>
+            <button class="btn-fechar" onclick="fecharModal('modal-carrinho')">×</button>
         </div>
         <div id="lista-carrinho" style="margin-bottom: 20px;"></div>
         
@@ -508,7 +508,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3>Finalizar Pedido</h3>
-            <button class="btn-fechar" onclick="fecharModal('modal-checkout')">&times;</button>
+            <button class="btn-fechar" onclick="fecharModal('modal-checkout')">×</button>
         </div>
 
         <label class="label-form">Seus Dados:</label>
@@ -591,7 +591,7 @@
         </select>
 
         <div id="div-pix" class="hidden pix-info-box">
-            <p class="pix-text"><strong>Chave Pix (Celular):</strong> 27999024130</p>
+            <p class="pix-text"><strong>Chave Pix (Celular):</strong> 27999</p>
             <p class="pix-text"><strong>Nome:</strong> Regiana Ferri</p>
             <p class="pix-alert"><i class="fas fa-exclamation-circle"></i> Envie o comprovante no WhatsApp.</p>
         </div>
@@ -691,6 +691,7 @@
     ];
 
     // ESTADO DO APLICATIVO
+    let lojaAberta = false; // Controle de abertura
     let carrinho = [];
     let produtoAtual = null;
     let quantidadeAtual = 1;
@@ -712,7 +713,7 @@
         localStorage.setItem('pastelanches_cart', JSON.stringify(carrinho));
     }
 
-    // --- NOVIDADE: CARREGAR DADOS DO CLIENTE ---
+    // --- CARREGAR DADOS DO CLIENTE ---
     function carregarDadosCliente() {
         const dados = JSON.parse(localStorage.getItem('pastelanches_cliente'));
         if(dados) {
@@ -729,7 +730,7 @@
         }
     }
 
-    // --- NOVIDADE: SALVAR DADOS DO CLIENTE ---
+    // --- SALVAR DADOS DO CLIENTE ---
     function salvarDadosCliente() {
         const dados = {
             nome: document.getElementById('cliente-nome').value,
@@ -806,6 +807,13 @@
 
     // MODAL DE PRODUTO
     function abrirModalProduto(index) {
+        // --- BLOQUEIO DE HORÁRIO ---
+        if (!lojaAberta) {
+            showToast("Estamos fechados! Atendemos de Terça a Domingo, das 18h às 23h.", "error");
+            return;
+        }
+        // ---------------------------
+
         produtoAtual = cardapio[index];
         quantidadeAtual = 1;
 
@@ -1013,7 +1021,7 @@
         atualizarTotalCheckout();
     }
     
-    // --- NOVIDADE: ALTERNAR ENTRE MANUAL E GPS ---
+    // --- ALTERNAR ENTRE MANUAL E GPS ---
     function alternarModoEndereco(modo) {
         modoEndereco = modo;
         const tabManual = document.getElementById('tab-manual');
@@ -1034,7 +1042,7 @@
         }
     }
 
-    // --- NOVIDADE: FUNÇÃO GPS ---
+    // --- FUNÇÃO GPS ---
     function capturarLocalizacao() {
         if (!navigator.geolocation) {
             showToast("Seu navegador não suporta GPS.", "error");
@@ -1077,6 +1085,14 @@
     }
 
     function finalizarPedidoZap() {
+        // --- BLOQUEIO DE HORÁRIO ---
+        verificarHorario(); 
+        if (!lojaAberta) {
+            showToast("A loja acabou de fechar! Não é possível enviar o pedido.", "error");
+            return;
+        }
+        // ---------------------------
+
         if (carrinho.length === 0) return;
 
         const nome = document.getElementById('cliente-nome').value;
@@ -1161,10 +1177,10 @@
         if(pagamento === "Dinheiro" && troco) {
             mensagem += `*Troco para:* ${troco}\n`;
         } else if (pagamento === "Pix") {
-            mensagem += `_(PIX: 27999024130 - Regiana Ferri - Enviar Comprovante do pagamento)_\n`;
+            mensagem += `_(PIX: 27999 - Regiana Ferri - Enviar Comprovante do pagamento)_\n`;
         }
 
-        const telefoneLoja = "5527999024130"; 
+        const telefoneLoja = "5527999"; 
         window.open(`https://wa.me/${telefoneLoja}?text=${encodeURIComponent(mensagem)}`, '_blank');
         
         // Limpa carrinho e memória do carrinho (mas mantém dados do cliente)
@@ -1175,15 +1191,42 @@
     }
 
     function verificarHorario() {
-        const hora = new Date().getHours();
+        const data = new Date();
+        const hora = data.getHours();
+        const dia = data.getDay(); // 0 = Domingo, 1 = Segunda, ... 6 = Sábado
+
         const statusEl = document.getElementById('status-loja');
-        // Ajuste aqui o horário se precisar (ex: 18h as 23h)
-        if (hora >= 18 && hora < 23) {
+        const listaProdutos = document.getElementById('cardapio-lista');
+
+        // REGRA: 
+        // 1. Aberto se o dia NÃO for Segunda (dia !== 1)
+        // 2. E se o horário for maior ou igual a 18 E menor que 23
+        const diaFuncionamento = dia !== 1; 
+        const horarioFuncionamento = hora >= 18 && hora < 23;
+
+        if (diaFuncionamento && horarioFuncionamento) {
+            lojaAberta = true;
             statusEl.innerText = "Aberto Agora";
             statusEl.classList.remove('fechado');
+            
+            // Visual do cardápio Normal
+            listaProdutos.style.opacity = "1";
+            listaProdutos.style.filter = "none";
         } else {
-            statusEl.innerText = "Fechado (Abre 18h)";
+            lojaAberta = false;
+            
+            // Mensagem personalizada dependendo do motivo
+            if (!diaFuncionamento) {
+                statusEl.innerText = "Fechado (Folga)";
+            } else {
+                statusEl.innerText = "Fechado (Abre 18h)";
+            }
+            
             statusEl.classList.add('fechado');
+
+            // Deixa o cardápio "apagado" (cinza e transparente)
+            listaProdutos.style.opacity = "0.5";
+            listaProdutos.style.filter = "grayscale(100%)";
         }
     }
 
