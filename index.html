@@ -1383,11 +1383,11 @@
     let eventoInstalacao;
     const btnInstalar = document.getElementById('btn-instalar-app');
 
-// Registra o Service Worker com o caminho correto do GitHub
+// Registra o Service Worker na raiz do novo domínio
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/pastelanches-/sw.js', { scope: '/pastelanches-/' })
-                .then(reg => console.log('SW registrado no repositório!'))
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('SW registrado no domínio principal!'))
                 .catch(err => console.log('Erro no SW', err));
         });
     }
