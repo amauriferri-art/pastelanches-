@@ -1383,11 +1383,11 @@
     let eventoInstalacao;
     const btnInstalar = document.getElementById('btn-instalar-app');
 
-    // Registra o Service Worker
+// Registra o Service Worker com o caminho correto do GitHub
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('SW registrado com sucesso!'))
+            navigator.serviceWorker.register('/pastelanches-/sw.js', { scope: '/pastelanches-/' })
+                .then(reg => console.log('SW registrado no repositório!'))
                 .catch(err => console.log('Erro no SW', err));
         });
     }
